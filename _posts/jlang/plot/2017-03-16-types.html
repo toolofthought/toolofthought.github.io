@@ -3,7 +3,7 @@ layout: post
 title:  "Plot Types"
 date:   2017-03-16 12:00:00 +0900
 author: yunskim
-categories: j-language plot
+categories: jlang plot
 permalink: /:categories/:title/
 ---
 
@@ -21,7 +21,7 @@ permalink: /:categories/:title/
 require 'plot numeric'
 X =: Y =: steps _4 4 8
 Z =: X -&*:/ Y
-BGC_z_ =: 255 255 248 NB. plot 배경색, 꼭 namespace를 _z_로 지정하세요.
+BGC_z_ =: 255 255 248 NB. plot 배경색, 꼭 locale을 _z_로 지정하세요.
 'type surface; boxed 0; mesh 0; backcolor BGC' plot X ; Y ; Z
 	</pre>
 </section>
