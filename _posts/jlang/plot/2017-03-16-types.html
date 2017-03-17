@@ -41,17 +41,17 @@ BC_z_ =: 255 255 248
 	<p><label for="area-streamgraph-basic-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="area-streamgraph-basic-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/area-streamgraph-basic.png"  alt="Image of Basic Streamgraph"/></span><code>bump</code>가 제대로 돌아가는지 확인하는 코드를 실행합니다.</p>
 	<pre class="code">
 bump =: 3 : 0
-m =. # y
-A =. y
+    m =. # y
+    A =. y
 
-height =. % 0.1 + ? 0
-start =. 0.5 -~ 2 * ? 0
-duration =. 10 % 0.1 + ? 0
+    height =. % 0.1 + ? 0
+    start =. 0.5 -~ 2 * ? 0
+    duration =. 10 % 0.1 + ? 0
 
-for_i. i. m do.
-    w =. ((i % m) - start) * duration
-    A =. ((height * ^ - *: w) + i{A) i} A
-end.
+    for_i. i. m do.
+        w =. ((i % m) - start) * duration
+        A =. ((height * ^ - *: w) + i{A) i} A
+    end.
 )
 
 n =: 9
@@ -76,11 +76,64 @@ BC_z_ =: 255 255 248
 'type area; color MYCOLORS; backcolor BC' plot data
 	</pre>
 
+	<p><label for="area-streamgraph-silhouette-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="area-streamgraph-silhouette-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/area-streamgraph-silhouette.png"  alt="Image of Silhouette Streamgraph"/></span>위의 예에서 base line \( G_0 = 0\) 으로 가정했습니다. 이제 베이스 라인을 조정해 같은 데이터로 다른 streamgraph를 만들어봅시다. <code>silhouette</code>이라고 불리는 기법은 각 데이터 포인트의 streamgraph 전체 높이 제곱의 합을 최소화 하는 기법입니다.
+	$$ G_0 =  - \frac{1}{2} \prod_{i=1} ^n f_i \ldotp $$
+	<code>silhouette</code>을 이용해 Streamgraph를 그려봅시다.
+	</p>
+	<pre class="code">
+bump =: 3 : 0
+    m =. # y
+    A =. y
+
+    height =. % 0.1 + ? 0
+    start =. 0.5 -~ 2 * ? 0
+    duration =. 10 % 0.1 + ? 0
+
+    for_i. i. m do.
+        w =. ((i % m) - start) * duration
+        A =. ((height * ^ - *: w) + i{A) i} A
+    end.
+)
+
+n =: 9
+m =: 200
+k =: 5
+data=: |. +/\ (/: +/"1) bump^:k"1 (n,m) $ 0
+g0 =: - -: {. data 
+
+require 'plot'
+MYCOLORS_z_ =: |. (".;._2) 0 : 0
+255 255 248
+255 247 236
+254 232 200
+253 212 158
+253 187 132
+252 141  89
+239 101  72
+215  48  31
+179   0   0
+127   0   0
+)
+BC_z_ =: 255 255 248
+map =: 4 : 0
+'a b c d' =. x
+values =. y
+(values - a) * (d - c) % (b - a)
+)
+
+sdata =: data (-"1 , ] ) g0
+'smin smax' =: (<./ , >./) , sdata 
+
+'type area; color MYCOLORS; backcolor BC; noaxes' plot (smin , smax, 0, 100)&map sdata
+	</pre>
+
+
 	<p>Streamgraph는 여러가지 layout을 제공하는데 가장 많이 쓰이는 <code>wiggle</code> 레이아웃을 추가로 적용해 보겠습니다. <code>wiggle</code>을 어떻게 구현하는지를 이해하는데 다음의 두 자료가 큰 도움이 됩니다. <a href="http://leebyron.com/streamgraph/stackedgraphs_byron_wattenberg.pdf">Lee Byron & Martin Wattenberg</a>이 기본 아이디어를 이해하는데 도움을 줍니다. 약간 다른 시각의 글로 <a href="http://yifanhu.net/PUB/StreamGraph.pdf">Marco Di Bartolomeo & Yifan Hu</a>의 작업이 있습니다. </p>
 
 	<p><code>wiggle</code>을 간단히 소개하자면 각각의 누적 그래프 선 변화율의 합이 최소가 되도록 베이스 라인  \( G_0 \) 을 조절하는 기법입니다. 자세한 내용은 위의 두 자료를 참고하세요.</p>
 
 	<pre class="code">
+
 	</pre>
 
 
