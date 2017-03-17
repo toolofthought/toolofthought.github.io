@@ -13,7 +13,7 @@ permalink: /:categories/:title/
 
 <section>
 	<h2>Area</h2>
-	<p><label for="area-basic-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="wire-basic-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/area-basic.png"  alt="Image of Basic Area Plot"/>기본 컬러코드를 사용하는 대신 <a href="http://colorbrewer2.org/#type=sequential&scheme=OrRd&n=9">colorbrewer2.org</a>에서 가져온 컬러코드를 사용합니다.</span>데이터 간의 차이를 알고 싶을 때 도움이 되는 <code>area</code>타입입니다. <code>matrix</code>를 데이터 타입으로 다음 행과의 차이를 면적으로 표현합니다.</p>
+	<p><label for="area-basic-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="area-basic-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/area-basic.png"  alt="Image of Basic Area Plot"/>기본 컬러코드를 사용하는 대신 <a href="http://colorbrewer2.org/#type=sequential&scheme=OrRd&n=9">colorbrewer2.org</a>에서 가져온 컬러코드를 사용합니다.</span>데이터 간의 차이를 알고 싶을 때 도움이 되는 <code>area</code>타입입니다. <code>matrix</code>를 데이터 타입으로 다음 행과의 차이를 면적으로 표현합니다.</p>
 
 	<p><code>area</code>타입은 2차원 그래프를 지원합니다.</p>
 	<pre class="code">
@@ -76,7 +76,12 @@ BC_z_ =: 255 255 248
 'type area; color MYCOLORS; backcolor BC' plot data
 	</pre>
 
-	<p>Streamgraph는 여러가지 layout을 제공하는데 가장 많이 쓰이는 <code>wiggle</code> 레이아웃을 추가로 적용해 보겠습니다. <code>wiggle</code>의 기본아이디어는 </p>
+	<p>Streamgraph는 여러가지 layout을 제공하는데 가장 많이 쓰이는 <code>wiggle</code> 레이아웃을 추가로 적용해 보겠습니다. <code>wiggle</code>을 어떻게 구현하는지를 이해하는데 다음의 두 자료가 큰 도움이 됩니다. <a href="http://leebyron.com/streamgraph/stackedgraphs_byron_wattenberg.pdf">Lee Byron & Martin Wattenberg</a>이 기본 아이디어를 이해하는데 도움을 줍니다. 약간 다른 시각의 글로 <a href="http://yifanhu.net/PUB/StreamGraph.pdf">Marco Di Bartolomeo & Yifan Hu</a>의 작업이 있습니다. </p>
+
+	<p><code>wiggle</code>을 간단히 소개하자면 각각의 누적 그래프 선 변화율의 합이 최소가 되도록 베이스 라인  \( G_0 \) 을 조절하는 기법입니다. 자세한 내용은 위의 두 자료를 참고하세요.</p>
+
+	<pre class="code">
+	</pre>
 
 
 </section>
