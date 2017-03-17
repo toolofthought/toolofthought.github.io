@@ -13,9 +13,9 @@ permalink: /:categories/:title/
 
 <section>
 	<h2>Area</h2>
-	<p><label for="area-basic-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="wire-basic-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/area-basic.png"  alt="Image of Basic Area Plot"/>기본 컬러코드를 사용하는 대신 <a href="http://colorbrewer2.org/#type=sequential&scheme=OrRd&n=9">http://colorbrewer2.org</a>에서 가져온 컬러코드를 사용합니다.</span>데이터의 차이나 변화량을 알아보고 싶을 때 도움이 되는 <code>area</code>타입입니다. <code>matrix</code>를 데이터 타입으로 다음 행과의 차이를 면적으로 표현합니다.</p>
+	<p><label for="area-basic-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="wire-basic-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/area-basic.png"  alt="Image of Basic Area Plot"/>기본 컬러코드를 사용하는 대신 <a href="http://colorbrewer2.org/#type=sequential&scheme=OrRd&n=9">colorbrewer2.org</a>에서 가져온 컬러코드를 사용합니다.</span>데이터 간의 차이를 알고 싶을 때 도움이 되는 <code>area</code>타입입니다. <code>matrix</code>를 데이터 타입으로 다음 행과의 차이를 면적으로 표현합니다.</p>
 
-	<p><code>area</code>타입은 2차원 그래프에서만 지원됩니다.</p>
+	<p><code>area</code>타입은 2차원 그래프를 지원합니다.</p>
 	<pre class="code">
 require 'plot'
 MYCOLORS_z_ =: |. (".;._2) 0 : 0
@@ -29,25 +29,70 @@ MYCOLORS_z_ =: |. (".;._2) 0 : 0
 179   0   0
 127   0   0
 )
-BGC_z_ =: 255 255 248
-'type area; color MYCOLORS; backcolor BGC' plot i. _9 20
+BC_z_ =: 255 255 248
+'type area; color MYCOLORS; backcolor BC' plot i. _9 20
 	</pre>
 
-	<h3>응용: streamgraph</h3>
+	<h3>응용: Streamgraph</h3>
+	<p>Streamgraph는 2008년 New York Times에서 영화 흥행에 관한 <a href="http://www.nytimes.com/interactive/2008/02/23/movies/20080223_REVENUE_GRAPHIC.html?_r=1&">데이터 비주얼라이제이션</a>에 사용된 이후 큰 인기를 끌고 있습니다. <code>D3.js</code>는 <code>stack layout</code>에서 지원하고 있어 편리하게 사용할 수 있는 쓸모있는 비주얼라이제이션 기법입니다.</p>
+
+	<p>먼저 random data를 만들어 주는 <code>bumps</code>를 정의합니다. Mike Bostock의 <a href="https://bl.ocks.org/mbostock/4060954">Streamgraph</a>와 Lee Byron의 <a href="https://github.com/leebyron/streamgraph/blob/master/LateOnsetDataSource.java">Streamgraph</a>를 참고해 <code>J</code>로 재작성합니다.</p>
+
+	<p><label for="area-streamgraph-basic-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="area-streamgraph-basic-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/area-streamgraph-basic.png"  alt="Image of Basic Streamgraph"/></span><code>bump</code>가 제대로 돌아가는지 확인하는 코드를 실행합니다.</p>
+	<pre class="code">
+bump =: 3 : 0
+m =. # y
+A =. y
+
+height =. % 0.1 + ? 0
+start =. 0.5 -~ 2 * ? 0
+duration =. 10 % 0.1 + ? 0
+
+for_i. i. m do.
+    w =. ((i % m) - start) * duration
+    A =. ((height * ^ - *: w) + i{A) i} A
+end.
+)
+
+n =: 9
+m =: 200
+k =: 5
+data=: |. +/\ (/: +/"1) bump^:k"1 (n,m) $ 0
+
+require 'plot'
+MYCOLORS_z_ =: |. (".;._2) 0 : 0
+255 247 236
+254 232 200
+253 212 158
+253 187 132
+252 141  89
+239 101  72
+215  48  31
+179   0   0
+127   0   0
+)
+BC_z_ =: 255 255 248
+
+'type area; color MYCOLORS; backcolor BC' plot data
+	</pre>
+
+	<p>Streamgraph는 여러가지 layout을 제공하는데 가장 많이 쓰이는 <code>wiggle</code> 레이아웃을 추가로 적용해 보겠습니다. <code>wiggle</code>의 기본아이디어는 </p>
+
+
 </section>
 
 <section>
 	<h2>Surface</h2>
 	<p><label for="surface-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="surface-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/surface.png"  alt="Image of Surface Plot"/>$$ z = x^2 - y^2. $$</span>3차원 데이터를 그릴 때 도움이 되는 <code>surface</code>타입입니다. 3차원 그래프의 기본타입으로 지정되어 있습니다. 따로 타입을 정하지 않는다면 <code>surface</code>플롯을 그립니다.</p>
 
-	<p><code>surface</code>타입은 3차원 그래프에서만 지원됩니다.</p>
+	<p><code>surface</code>타입은 3차원 그래프를 지원됩니다.</p>
 	
 	<pre class="code">
 require 'plot numeric'
 X =: Y =: steps _4 4 8
 Z =: X -&*:/ Y
-BGC_z_ =: 255 255 248 NB. plot 배경색, 꼭 locale을 _z_로 지정하세요.
-'type surface; boxed 0; mesh 0; backcolor BGC' plot X ; Y ; Z
+BC_z_ =: 255 255 248 NB. plot 배경색, 꼭 locale을 _z_로 지정하세요.
+'type surface; boxed 0; mesh 0; backcolor BC' plot X ; Y ; Z
 	</pre>
 </section>
 
