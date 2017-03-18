@@ -301,13 +301,13 @@ dat =: (; (; -&*:/~)) X
 
 pd 'reset'
 
-pd 'new 30 200 480 900'
+pd 'new 30 200 480 900' NB. bottom x, bottom y, top x, top y
 pd 'type surface'
 pd 'color MYCOLORS'
 pd 'backcolor BC'
 pd 'noaxes'
 pd dat
-pd 'new 510 200 960 900'
+pd 'new 510 200 960 900' NB. bottom x, bottom y, top x, top y
 pd 'type density'
 pd 'color MYCOLORS'
 pd 'backcolor BC'
@@ -326,11 +326,22 @@ pd 'show'
 	
 	
 	<pre class="code">
+MYCOLORS_z_ =: ".;._2 (0 : 0)
+247 252 253
+224 236 244
+191 211 230
+158 188 218
+140 150 198
+140 107 177
+136 65 157
+129 15 124
+77 0 75
+)
 require 'plot numeric'
 X =: Y =: steps _4 4 8
 Z =: X -&*:/ Y
 BC_z_ =: 255 255 248 NB. plot 배경색, 꼭 locale을 _z_로 지정하세요.
-'type surface; boxed 0; mesh 0; backcolor BC' plot X ; Y ; Z
+'type surface; boxed 0; mesh 0; backcolor BC; color MYCOLORS' plot X ; Y ; Z
 	</pre>
 </section>
 
