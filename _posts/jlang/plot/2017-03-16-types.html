@@ -174,13 +174,84 @@ values =. y
 )
 
 wdata =: |. +/\ g0 , fs
-'smin smax' =: (<./ , >./) , wdata 
+'wmin wmax' =: (<./ , >./) , wdata 
 
-'type area; color MYCOLORS; backcolor BC; noaxes' plot (smin , smax, 0, 100)&map wdata
+'type area; color MYCOLORS; backcolor BC; noaxes' plot (wmin , wmax, 0, 100)&map wdata
 
 	</pre>
+</section>
+<section>
+	<h2>Bar</h2>
+	<p><label for="bar-basic-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="bar-basic-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/bar-basic.png"  alt="Image of Basic Bar Plot"/></span>막대 그래프 그래프를 그려봅시다. 이번에는 <code>plot</code>을 사용하는 대신 <a href="http://code.jsoftware.com/wiki/Plot/Verbs"><code>pd</code>명령</a>을 사용하겠습니다.</p>
+	<pre class="code">
+require 'plot'
 
+MYCOLORS_z_ =: ".;._2 ] 0 : 0 
+252 251 253
+239 237 245
+218 218 235
+188 189 220
+158 154 200
+128 125 186
+106  81 163
+ 84  39 143
+ 63   0 125
+)
+BC_z_ =: 255 255 248
 
+pd 'reset'
+pd 'type bar'
+pd 'color MYCOLORS'
+pd 'axes 1 0'
+pd 'xlabel ',":2001+i.6
+pd 'backcolor BC'
+pd 0.6 0.8 1 * _0.5+?.3#,:3 3 4 7 7 4
+pd 'show'
+	</pre>
+
+	<h3>Stacked Bar</h3>
+	<p><label for="bar-sbar-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="bar-sbar-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/bar-sbar.png"  alt="Image of Stacked Bar Plot"/></span>데이터를 그룹지어 표시하는 대신 하나의 축에 쌓아서 보여줄 수 있습니다. <code>sbar</code>타입을 사용하면 그래프를 쉽게 그릴 수 있습니다. <code>sbar</code>를 사용할 때 마이너스 값을 사용할 수 없다는 점을 주의하세요.</p>
+	<pre class="code">
+require 'plot'
+
+MYCOLORS_z_ =: ".;._2 ] 0 : 0 
+224 236 244
+158 188 218
+136 86 167
+)
+BC_z_ =: 255 255 248
+
+pd 'reset'
+pd 'type sbar'
+pd 'color MYCOLORS'
+pd 'ytic 2 0'
+pd 'xlabel ',":2001+i.6
+pd 'backcolor BC'
+pd 0.6 0.8 1* >:?.3#,:3 3 4 7 7
+pd 'show'
+
+	</pre>
+	<h3>Floating Stacked Bar</h3>
+	<p><label for="bar-fbar-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="bar-fbar-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/bar-fbar.png"  alt="Image of Floating Stacked Bar Plot"/><code>MYCOLORS</code>의 순서가 <code>sbar</code>의 사례와 다른 것을 주의하세요.</span><code>fbar</code>는 모든 점에서 <code>sbar</code>와 동일하지만 가장 아래 데이터 레이어가 투명으로 처리됩니다.</p>
+	<pre class="code">
+require 'plot'
+
+MYCOLORS_z_ =: ".;._2 ] 0 : 0 
+158 188 218
+136 86 167
+224 236 244
+)
+BC_z_ =: 255 255 248
+
+pd 'reset'
+pd 'type fbar'
+pd 'color MYCOLORS'
+pd 'ytic 2 0'
+pd 'xlabel ',":2001+i.6
+pd 'backcolor BC'
+pd 0.6 0.8 1* >:?.3#,:3 3 4 7 7
+pd 'show'
+	</pre>
 </section>
 
 <section>
