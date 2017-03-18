@@ -232,7 +232,7 @@ pd 'show'
 
 	</pre>
 	<h3>Floating Stacked Bar</h3>
-	<p><label for="bar-fbar-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="bar-fbar-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/bar-fbar.png"  alt="Image of Floating Stacked Bar Plot"/><code>MYCOLORS</code>의 순서가 <code>sbar</code>의 사례와 다른 것을 주의하세요.</span><code>fbar</code>는 모든 점에서 <code>sbar</code>와 동일하지만 가장 아래 데이터 레이어가 투명으로 처리됩니다.</p>
+	<p><label for="bar-fbar-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="bar-fbar-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/bar-fbar.png"  alt="Image of Floating Stacked Bar Plot"/><code>MYCOLORS</code>의 순서가 <code>sbar</code>의 사례와 다른 것에 주의하세요.</span><code>fbar</code>는 모든 점에서 <code>sbar</code>와 동일하지만 가장 아래 데이터 레이어가 투명으로 처리됩니다.</p>
 	<pre class="code">
 require 'plot'
 
@@ -255,10 +255,75 @@ pd 'show'
 </section>
 
 <section>
+	<h2>Contour</h2>
+	<p><label for="contour-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="contour-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/contour.png"  alt="Image of Contour Plot"/>$$ z = x^2 - y^2. $$</span>3차원 그래프를 평면에 투사한 등고선 그래프입니다.</p>
+	<pre class="code">
+require 'plot numeric'
+BC_z_ =: 255 255 248
+X =: Y =: steps _4 4 100
+Z =: X -&*:/ Y
+
+pd 'reset'
+pd 'type contour'
+pd 'color MYCOLORS'
+pd 'xtic 2 1'
+pd 'ytic 2 0'
+pd 'backcolor BC'
+pd X ; Y ; Z
+pd 'show'
+	</pre>
+</section>
+
+<section>
+	<h2>Density</h2>
+	<p>3차원 데이터를 2차원에 표현하는 여러 방법 중 하나로 색상에 따라 값의 크기를 짐작할 수 있는 그래프입니다.</p>
+	<figure>
+        <label for="surface-density-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="surface-density-figure" class="margin-toggle"/><span class="marginnote">\( z = x^2 - y^2 \) 그래프를 <code>surface</code>와 <code>density</code> 두가지 방법으로 그려보았습니다.</span>
+        <img src="{{site.baseurl}}/assets/img/jlang/plot/surface-density.png" alt="Image of Surface and Density Plot"/>
+    </figure>
+	<pre class="code">
+MYCOLORS_z_ =: ".;._2 (0 : 0)
+255 247 251
+236 231 242
+208 209 230
+166 189 219
+116 169 207
+54 144 192
+5 112 176
+4 90 141
+2 56 88
+)
+BC_z_ =: 255 255 248
+
+require 'plot numeric'
+X =: steps _4 4 8
+dat =: (; (; -&*:/~)) X
+
+pd 'reset'
+
+pd 'new 30 200 480 900'
+pd 'type surface'
+pd 'color MYCOLORS'
+pd 'backcolor BC'
+pd 'noaxes'
+pd dat
+pd 'new 510 200 960 900'
+pd 'type density'
+pd 'color MYCOLORS'
+pd 'backcolor BC'
+pd 'noaxes'
+pd 'aspect 1'
+pd dat
+pd 'show'
+	</pre>
+</section>
+
+<section>
 	<h2>Surface</h2>
 	<p><label for="surface-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="surface-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/surface.png"  alt="Image of Surface Plot"/>$$ z = x^2 - y^2. $$</span>3차원 데이터를 그릴 때 도움이 되는 <code>surface</code>타입입니다. 3차원 그래프의 기본타입으로 지정되어 있습니다. 따로 타입을 정하지 않는다면 <code>surface</code>플롯을 그립니다.</p>
 
 	<p><code>surface</code>타입은 3차원 그래프를 지원됩니다.</p>
+	
 	
 	<pre class="code">
 require 'plot numeric'
