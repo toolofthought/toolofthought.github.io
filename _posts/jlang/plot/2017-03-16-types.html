@@ -319,6 +319,39 @@ pd 'show'
 </section>
 
 <section>
+	<h2>Dot</h2>
+	<p><code>dot</code>차트는 특별히 자료를 가공하는 대신 자료의 값을 좌표삼아 평면에 뿌리는 차트입니다. 임의의 데이터를 사용하는 대신 실제 연구결과를 사용해 봅시다. <code>dot</code> 차트 중 가장 유명한 것이라면 아무래도 <a href="https://en.wikipedia.org/wiki/Francis_Galton">골턴</a>의 실험이 아닌가 합니다. 골턴이 한 연구 중 가장 유명한 것은 부모의 키와 자녀의 키사이의 관계를 추적한 연구입니다. 실제 데이터를 구해 <code>dot</code>차트를 이용해 직접 역사적인 실험을 재현해 봅시다.</p>
+	<figure>
+        <label for="dot-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="dot-figure" class="margin-toggle"/><span class="marginnote">from <a href="http://www.math.uah.edu/stat/data/Galton.html">Random</a></span>
+        <img src="{{site.baseurl}}/assets/img/jlang/plot/dot.png" alt="Relationship between father's height and son's one"/>
+    </figure>
+	<pre class="code">
+require 'web/gethttp plot'
+txt =: gethttp 'http://www.math.uah.edu/stat/data/Galton.csv'
+M =: (#~ (<,:'M') = 3&{"1) ','&cutopen ;._2 txt , CR
+
+X =: ; ". L: 0 (< a:;1) { M 	NB. 아버지 키 in inch
+Y =: ; ". L: 0 (< a:;4) { M 	NB. 아들 키 in inch
+
+MYCOLORS_z_ =: 0 109 44 ,: 199 233 192
+BC_z_ =: 255 255 248
+
+pd 'reset'
+pd 'type dot'
+pd 'color MYCOLORS'
+pd 'backcolor BC'
+pd 'pensize 5'
+pd 'xcaption father''s height'
+pd 'ycaption son''s height'
+pd X ; Y
+
+pd 'show'
+
+	</pre>
+	<p>아버지 키와 아들 키 간의 관계가 잘 보이십니까? 골턴의 연구는 정묘한 수학적 증명으로 이어지지는 못했지만 많은 사람들에게 특히 회귀분석을 접하는 사람들에게 많은 영감을 주고 있습니다.</p>
+</section>
+
+<section>
 	<h2>Surface</h2>
 	<p><label for="surface-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="surface-figure" class="margin-toggle"/><span class="marginnote"><img src="{{site.baseurl}}/assets/img/jlang/plot/surface.png"  alt="Image of Surface Plot"/>$$ z = x^2 - y^2. $$</span>3차원 데이터를 그릴 때 도움이 되는 <code>surface</code>타입입니다. 3차원 그래프의 기본타입으로 지정되어 있습니다. 따로 타입을 정하지 않는다면 <code>surface</code>플롯을 그립니다.</p>
 
