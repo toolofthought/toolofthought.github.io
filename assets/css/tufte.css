@@ -224,6 +224,13 @@ pre.code { font-size: 0.9rem;
 
 pre.code.fullwidth { width: 90%; }
 
+xmp.code { font-size: 0.9rem;
+           width: 52.5%;
+           margin-left: 2.5%;
+           overflow-x: auto; }
+
+xmp.code.fullwidth { width: 90%; }
+
 .fullwidth { max-width: 90%;
              clear:both; }
 
