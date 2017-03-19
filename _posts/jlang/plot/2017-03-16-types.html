@@ -179,6 +179,8 @@ wdata =: |. +/\ g0 , fs
 'type area; color MYCOLORS; backcolor BC; noaxes' plot (wmin , wmax, 0, 100)&map wdata
 
 	</pre>
+	<h3>D3 streamgraph</h3>
+	<p><code>qt webview</code>를 사용해 <code>d3.js</code>라이브러리를 네이티브로 실행할 수 있습니다. 자세한 내용은 <a href="{{ site.baseurl }}{% post_url /jlang/qt/2017-03-19-webview-and-d3 %}">링크</a>를 참조하세요.</p>
 </section>
 <section>
 	<h2>Bar</h2>
@@ -385,38 +387,36 @@ pd 'show'
     </figure>
 
 	<pre class="code">
-require 'jzplot'
+require 'plot'
 
 stocks =: }. 'm' fread jpath '~addons/demos/wdplot/dm0396.txt'
 dat =: |: ".&> (< a:;2 3 4) { ','&cut"1 (- 100 <. # stocks) {. stocks
 
-plotwh =: 3 : 0
-480 360 plotwh y
-:
-wd 'pc myform'
-wd 'minwh ', ": x
-wd 'cc myplot isigraph flush'
-wd 'pas 0 0'
-
-loc =: ('myform'; 'myplot') conew 'jzplot'
-pd__loc 'type hilo'
-pd__loc 'color 35 139 69'
-pd__loc 'backcolor 255 255 248'
-pd__loc 'pensize 3'
-pd__loc y
-
-wd 'pshow'
-)
-
-myform_close =: 3 : 0
-wd 'pclose'
-destroy__loc ''
-)
-
-1800 600 plotwh dat
+pd 'reset'
+pd 'type hilo'
+pd 'color 35 139 69'
+pd 'backcolor 255 255 248'
+pd 'pensize 3'
+pd dat
+pd 'show'
 
 	</pre>
 
+	<p>만약 파일로 저장하려면 <code>qtc</code> 명령을 사용하면 편리합니다.
+	<pre class="code">
+require 'plot'
+
+stocks =: }. 'm' fread jpath '~addons/demos/wdplot/dm0396.txt'
+dat =: |: ".&> (< a:;2 3 4) { ','&cut"1 (- 100 <. # stocks) {. stocks
+
+pd 'reset'
+pd 'type hilo'
+pd 'color 35 139 69'
+pd 'backcolor 255 255 248'
+pd 'pensize 3'
+pd dat
+pd 'qtc 1800 600 ', jpath '~temp/qtc-shortcut.png'
+	</pre>
 
 </section>
 <section>
