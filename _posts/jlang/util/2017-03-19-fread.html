@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "fread"
+title:  "Fread"
 date:   2017-03-19 12:00:00 +0900
 author: yunskim
 categories: jlang util
@@ -8,7 +8,7 @@ permalink: /:categories/:title/
 ---
 <section>
 	<p><code>fread</code>는 파일을 읽을 때 사용하는 유틸리티입니다. <code>y</code>에 파일의 위치를 <code>boxed string</code>으로 입력합니다. <code>x</code>에는 옵션을 입력하는데 <code>'b'</code>은 boxed nouns으로, <code>'m'</code>은 보통의 noun으로 값을 반환합니다.</p>
-
+	<h3> <code>'b'</code> option </h3>
 	<pre class="code">
 	,. 10 {.'b' fread jpath '~addons/demos/wdplot/dm0396.txt'
 ┌─────────────────────────────────────────────────────┐
@@ -32,7 +32,9 @@ permalink: /:categories/:title/
 ├─────────────────────────────────────────────────────┤
 │01/05/95,65.750,65.750,65.750,65.750,24562,73596     │
 └─────────────────────────────────────────────────────┘
-	
+	</pre>
+	<h3> <code>'m'</code> option </h3>
+	<pre>
 	10 {. 'm' fread jpath '~addons/demos/wdplot/dm0396.txt'
 "Date","Open","High","Low","Close","Volume","OpenInt"
 12/22/94,64.560,64.560,64.560,64.560,28034,73861     
