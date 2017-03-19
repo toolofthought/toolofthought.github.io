@@ -1,0 +1,29 @@
+require 'jzplot'
+
+stocks =: }. 'm' fread jpath '~addons/demos/wdplot/dm0396.txt'
+dat =: |: ".&> (< a:;2 3 4) { ','&cut"1 (- 100 <. # stocks) {. stocks
+
+plotwh =: 3 : 0
+480 360 plotwh y
+:
+wd 'pc myform'
+wd 'minwh ', ": x
+wd 'cc myplot isigraph flush'
+wd 'pas 0 0'
+
+loc =: ('myform'; 'myplot') conew 'jzplot'
+pd__loc 'type hilo'
+pd__loc 'color 35 139 69'
+pd__loc 'backcolor 255 255 248'
+pd__loc 'pensize 3'
+pd__loc y
+
+wd 'pshow'
+)
+
+myform_close =: 3 : 0
+wd 'pclose'
+destroy__loc ''
+)
+
+1800 600 plotwh dat
