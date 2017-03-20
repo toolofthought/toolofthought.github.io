@@ -40,18 +40,25 @@ xmp.code { font-size: 0.9rem;
 
 xmp.code.fullwidth { width: 90%; }
 
-/* index.html
-*/
+/* index.html */
 li.listing {
   list-style: none;
 }
 
 .smaller { font-size: 80%;}
-/* end index.html
-*/
+
+.post-subtitle {
+  margin: 0;
+  margin-bottom: 10px;
+}
+.post-meta {
+  margin-top: 10px;
+}
+/* end index.html */
 
 /* begin nav */
 nav li {
   display: inline;
 }
 /* end nav */
+
