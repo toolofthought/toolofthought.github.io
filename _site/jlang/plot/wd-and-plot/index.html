@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Window Dirver를 이용해 Plot 사용하기</title>
+  <meta name="description" content="require &#39;jzplot&#39;">
+
+  <link rel="stylesheet" href="/assets/css/tufte.css">
+  <link rel="stylesheet" href="/assets/css/latex.css">
+  <link rel="stylesheet" href="/assets/css/toolofthought.css">
+  <link rel="canonical" href="http://toolofthought.github.com/jlang/plot/wd-and-plot/">
+  <link rel="alternate" type="application/rss+xml" title="Tool of Thought" href="/feed.xml">
+</head>
+
+  <body>
+  	<!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+    	<ul>
+    		<li class="listing"><a href="/">Home</a></li>
+    	</ul>
+	</nav>
+</header>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Window Dirver를 이용해 Plot 사용하기</h1>
+    <p class="post-meta"><span class="subtitle" itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">yunskim</span></span> • <time class="subtitle" datetime="2017-03-16T12:00:00+09:00" itemprop="datePublished">Mar 16, 2017</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    require 'jzplot'
+
+stocks =: }. 'm' fread jpath '~addons/demos/wdplot/dm0396.txt'
+dat =: |: ".&> (< a:;2 3 4) { ','&cut"1 (- 100 <. # stocks) {. stocks
+
+plotwh =: 3 : 0
+480 360 plotwh y
+:
+wd 'pc myform'
+wd 'minwh ', ": x
+wd 'cc myplot isigraph flush'
+wd 'pas 0 0'
+
+loc =: ('myform'; 'myplot') conew 'jzplot'
+pd__loc 'type hilo'
+pd__loc 'color 35 139 69'
+pd__loc 'backcolor 255 255 248'
+pd__loc 'pensize 3'
+pd__loc y
+
+wd 'pshow'
+)
+
+myform_close =: 3 : 0
+wd 'pclose'
+destroy__loc ''
+)
+
+1800 600 plotwh dat
+  </div>
+
+  
+
+</article>
+      </div>
+    </main>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+  </body>
+
+</html>

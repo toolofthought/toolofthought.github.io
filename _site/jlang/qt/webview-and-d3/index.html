@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Webview and D3</title>
+  <meta name="description" content="Streamgraph webview를 이용해 native로 D3코드를 실행합니다. &amp;#8853; coclass &#39;webd3&#39;">
+
+  <link rel="stylesheet" href="/assets/css/tufte.css">
+  <link rel="stylesheet" href="/assets/css/latex.css">
+  <link rel="stylesheet" href="/assets/css/toolofthought.css">
+  <link rel="canonical" href="http://toolofthought.github.com/jlang/qt/webview-and-d3/">
+  <link rel="alternate" type="application/rss+xml" title="Tool of Thought" href="/feed.xml">
+</head>
+
+  <body>
+  	<!--- Header and nav template site-wide -->
+<header>
+    <nav class="group">
+    	<ul>
+    		<li class="listing"><a href="/">Home</a></li>
+    	</ul>
+	</nav>
+</header>
+    <main class="page-content" aria-label="Content">
+      <div class="wrapper">
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="post-header">
+    <h1 class="post-title" itemprop="name headline">Webview and D3</h1>
+    <p class="post-meta"><span class="subtitle" itemprop="author" itemscope itemtype="http://schema.org/Person"><span itemprop="name">yunskim</span></span> • <time class="subtitle" datetime="2017-03-18T12:00:00+09:00" itemprop="datePublished">Mar 18, 2017</time></p>
+  </header>
+
+  <div class="post-content" itemprop="articleBody">
+    <section>
+	<h2>Streamgraph</h2>
+	<p><code>webview</code>를 이용해 native로 <code>D3</code>코드를 실행합니다.
+	<figure>
+        <label for="webd3-streamgraph-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="webd3-streamgraph-figure" class="margin-toggle"/><span class="marginnote"></span>
+        <img src="/assets/img/jlang/qt/webd3-streamgraph.png" alt="Image of D3 native Streamgraph Plot"/>
+    </figure>
+	<xmp class="code">
+coclass 'webd3'
+
+draw =: 3 : 0
+wd 'pc browser'
+wd 'setp stylesheet * * { background-color: #fffff8; }'
+wd 'minwh 970 500'
+wd 'pas 0 0'
+wd 'cc window webview'
+wd 'pshow'
+wd 'set window baseurl *', file2url jpath '~addons'
+wd 'set window html *', HTML
+)
+
+
+HTML =: 0 : 0
+<!DOCTYPE html>
+<meta charset="utf-8">
+<title>Streamgraph</title>
+<style>
+body {
+	background-color: #fffff8;
+}
+
+button {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
+</style>
+<button onclick="transition()">Update</button>
+<svg width="960" height="500"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var n = 9, // number of layers
+    m = 200, // number of samples per layer
+    k = 10; // number of bumps per layer
+
+var stack = d3.stack().keys(d3.range(n)).offset(d3.stackOffsetWiggle),
+    layers0 = stack(d3.transpose(d3.range(n).map(function() { return bumps(m, k); }))),
+    layers1 = stack(d3.transpose(d3.range(n).map(function() { return bumps(m, k); }))),
+    layers = layers0.concat(layers1);
+
+var svg = d3.select("svg"),
+    width = +svg.attr("width"),
+    height = +svg.attr("height");
+
+var x = d3.scaleLinear()
+    .domain([0, m - 1])
+    .range([0, width]);
+
+var y = d3.scaleLinear()
+    .domain([d3.min(layers, stackMin), d3.max(layers, stackMax)])
+    .range([height, 0]);
+
+var z = d3.interpolateCool;
+
+var area = d3.area()
+    .x(function(d, i) { return x(i); })
+    .y0(function(d) { return y(d[0]); })
+    .y1(function(d) { return y(d[1]); });
+
+svg.selectAll("path")
+  .data(layers0)
+  .enter().append("path")
+    .attr("d", area)
+    .attr("fill", function() { return z(Math.random()); });
+
+function stackMax(layer) {
+  return d3.max(layer, function(d) { return d[1]; });
+}
+
+function stackMin(layer) {
+  return d3.min(layer, function(d) { return d[0]; });
+}
+
+function transition() {
+  var t;
+  d3.selectAll("path")
+    .data((t = layers1, layers1 = layers0, layers0 = t))
+    .transition()
+      .duration(2500)
+      .attr("d", area);
+}
+
+// Inspired by Lee Byron’s test data generator.
+function bumps(n, m) {
+  var a = [], i;
+  for (i = 0; i < n; ++i) a[i] = 0;
+  for (i = 0; i < m; ++i) bump(a, n);
+  return a;
+}
+
+function bump(a, n) {
+  var x = 1 / (0.1 + Math.random()),
+      y = 2 * Math.random() - 0.5,
+      z = 10 / (0.1 + Math.random());
+  for (var i = 0; i < n; i++) {
+    var w = (i / n - y) * z;
+    a[i] += x * Math.exp(-w * w);
+  }
+}
+
+</script>
+)
+
+browser_close =: 3 : 0
+wd 'pclose'
+)
+
+draw_webd3_ ''
+
+	</xmp>
+</section>
+
+
+  </div>
+
+  
+
+</article>
+      </div>
+    </main>
+    <script type="text/javascript" async src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
+  </body>
+
+</html>

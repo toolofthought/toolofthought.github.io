@@ -1,0 +1,1036 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Tool of Thought</title>
+    <description></description>
+    <link>http://toolofthought.github.com/</link>
+    <atom:link href="http://toolofthought.github.com/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Mon, 20 Mar 2017 23:01:24 +0900</pubDate>
+    <lastBuildDate>Mon, 20 Mar 2017 23:01:24 +0900</lastBuildDate>
+    <generator>Jekyll v3.4.2</generator>
+    
+      <item>
+        <title>Annotated Streamgraph</title>
+        <description>&lt;figure class=&quot;fullwidth&quot;&gt;
+    &lt;img src=&quot;/assets/img/vis/d3/streamgraph.png&quot; alt=&quot;Streamgraph&quot;/&gt;
+&lt;/figure&gt;
+&lt;p&gt;&lt;label for=&quot;surface-density-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;surface-density-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;a href=&quot;https://bl.ocks.org/mbostock/4060954&quot;&gt;Mike Bostock’s Block 4060954&lt;/a&gt;&lt;/span&gt;&lt;/p&gt;
+&lt;xmp class=&quot;code&quot;&gt;
+&lt;!DOCTYPE html&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;title&gt; my streamgraph &lt;/title&gt;
+&lt;style&gt;
+button {
+    margin-top: 10px;
+    margin-left: 10px;
+}
+&lt;/style&gt;
+&lt;button onclick=&quot;transition()&quot;&gt;Update&lt;/button&gt;
+&lt;svg width=&quot;960&quot; height=&quot;510&quot;&gt;&lt;/svg&gt;
+&lt;script src=&quot;https://d3js.org/d3.v4.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+/* html 태그 지정 */
+var svg = d3.select(&quot;svg&quot;);
+var width = +svg.attr(&quot;width&quot;);
+var height = +svg.attr(&quot;height&quot;);
+
+/* 주요 변수 지정 */
+var n = 2;
+var m = 10;
+var k = 5;
+
+// random 데이터 생성
+// Inspired by Lee Byron’s test data generator.
+function bumps(m, k) {
+    var a = [], i;
+    for (i = 0; i &lt; m; ++i) a[i] = 0;
+    for (i = 0; i &lt; k; ++i) bump(a, m);
+    return a;
+}
+
+function bump(a, m) {
+    var x = 1 / (0.1 + Math.random()),
+            y = 2 * Math.random() - 0.5,
+            z = 10 / (0.1 + Math.random());
+    for (var i = 0; i &lt; m; i++) {
+        var w = (i / m - y) * z;
+        a[i] += x * Math.exp(-w * w);
+    }
+}
+
+/* stack 데이터 준비
+
+stack 데이터는 csv 파일과 유사하게 각 컬럼이 하나의 데이터 세트입니다.
+각 컬럼은 layer에 대응되고  stack의 keys에 대응됩니다
+
+    $ layers01
+m n
+    $ layers
+2m n
+    # keys
+n
+
+*/
+var stack = d3.stack().keys(d3.range(n)).offset(d3.stackOffsetWiggle);
+var layers0 = stack(d3.transpose(d3.range(n).map(function() { return bumps(m, k); })));
+var layers1 = stack(d3.transpose(d3.range(n).map(function() { return bumps(m, k); })));
+var layers = layers0.concat(layers1);
+
+
+/* scale 설정 */
+var x = d3.scaleLinear()
+    .domain([0, m-1])
+    .range([0, width]);
+
+var y = d3.scaleLinear()
+    .domain([d3.min(layers, rowMin), d3.max(layers, rowMax)])
+    .range([height, 0]);
+
+
+/* stackMin, stackMax 정의
+    stackMin b. 0 NB. n에 대해서 최소와 최대를 찾습니다.
+1
+*/
+
+function rowMin(row) {
+    return d3.min(row, function(d) { return d[0]; });
+}
+
+function rowMax(row) {
+    return d3.max(row, function(d) { return d[1]; });
+}
+
+// area 설정
+// x
+// y0
+// y1
+
+var area = d3.area()
+    .x(function(d, i) { return x(i); })
+    .y0(function(d) { return y(d[0]); })
+    .y1(function(d) { return y(d[1]); });
+
+// color picker 정의
+var z = d3.interpolateCool;
+
+// svg 생성
+svg.selectAll(&quot;path&quot;)
+    .data(layers0)
+    .enter()
+        .append(&quot;path&quot;)
+        .attr(&quot;d&quot;, area) // area&quot;1 layers01 과 유사합니다.
+        .attr(&quot;fill&quot;, function() { return z(Math.random()); });
+
+// button에 연결할 transition() 함수 정의
+// (t = layers1, layers1 = layers0, layers0 = t)는 쉼표연산자
+// 왼쪽 operand는 evaluated되지만 반환되지 않고 오른쪽 operand가 반환됨
+function transition() {
+    var t;
+    d3.selectAll(&quot;path&quot;)
+        .data((t = layers1, layers1 = layers0, layers0 = t))
+        .transition()
+            .duration(2500)
+            .attr(&quot;d&quot;, area);
+}
+
+&lt;/script&gt;
+&lt;/xmp&gt;
+</description>
+        <pubDate>Mon, 20 Mar 2017 12:00:00 +0900</pubDate>
+        <link>http://toolofthought.github.com/vis/d3/annotated-d3-streamgraph/</link>
+        <guid isPermaLink="true">http://toolofthought.github.com/vis/d3/annotated-d3-streamgraph/</guid>
+        
+        
+        <category>vis</category>
+        
+        <category>d3</category>
+        
+      </item>
+    
+      <item>
+        <title>Fread</title>
+        <description>&lt;section&gt;
+	&lt;p&gt;&lt;code&gt;fread&lt;/code&gt;는 파일을 읽을 때 사용하는 유틸리티입니다. &lt;code&gt;y&lt;/code&gt;에 파일의 위치를 &lt;code&gt;boxed string&lt;/code&gt;으로 입력합니다. &lt;code&gt;x&lt;/code&gt;에는 옵션을 입력하는데 &lt;code&gt;'b'&lt;/code&gt;은 boxed nouns으로, &lt;code&gt;'m'&lt;/code&gt;은 보통의 noun으로 값을 반환합니다.&lt;/p&gt;
+	&lt;h3&gt; &lt;code&gt;'b'&lt;/code&gt; option &lt;/h3&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+	,. 10 {.'b' fread jpath '~addons/demos/wdplot/dm0396.txt'
+┌─────────────────────────────────────────────────────┐
+│&quot;Date&quot;,&quot;Open&quot;,&quot;High&quot;,&quot;Low&quot;,&quot;Close&quot;,&quot;Volume&quot;,&quot;OpenInt&quot;│
+├─────────────────────────────────────────────────────┤
+│12/22/94,64.560,64.560,64.560,64.560,28034,73861     │
+├─────────────────────────────────────────────────────┤
+│12/23/94,64.490,64.490,64.490,64.490,6301,73975      │
+├─────────────────────────────────────────────────────┤
+│12/27/94,64.540,64.740,64.540,64.740,5150,74147      │
+├─────────────────────────────────────────────────────┤
+│12/28/94,66.000,66.130,66.000,66.130,48671,73671     │
+├─────────────────────────────────────────────────────┤
+│12/29/94,65.630,65.630,65.630,65.630,31233,70876     │
+├─────────────────────────────────────────────────────┤
+│12/30/94,65.920,65.920,65.920,65.920,9355,69792      │
+├─────────────────────────────────────────────────────┤
+│01/03/95,65.580,65.580,65.580,65.580,22134,71231     │
+├─────────────────────────────────────────────────────┤
+│01/04/95,65.390,65.390,65.390,65.390,27410,71688     │
+├─────────────────────────────────────────────────────┤
+│01/05/95,65.750,65.750,65.750,65.750,24562,73596     │
+└─────────────────────────────────────────────────────┘
+	&lt;/pre&gt;
+	&lt;h3&gt; &lt;code&gt;'m'&lt;/code&gt; option &lt;/h3&gt;
+	&lt;pre&gt;
+	10 {. 'm' fread jpath '~addons/demos/wdplot/dm0396.txt'
+&quot;Date&quot;,&quot;Open&quot;,&quot;High&quot;,&quot;Low&quot;,&quot;Close&quot;,&quot;Volume&quot;,&quot;OpenInt&quot;
+12/22/94,64.560,64.560,64.560,64.560,28034,73861     
+12/23/94,64.490,64.490,64.490,64.490,6301,73975      
+12/27/94,64.540,64.740,64.540,64.740,5150,74147      
+12/28/94,66.000,66.130,66.000,66.130,48671,73671     
+12/29/94,65.630,65.630,65.630,65.630,31233,70876     
+12/30/94,65.920,65.920,65.920,65.920,9355,69792      
+01/03/95,65.580,65.580,65.580,65.580,22134,71231     
+01/04/95,65.390,65.390,65.390,65.390,27410,71688     
+01/05/95,65.750,65.750,65.750,65.750,24562,73596     
+	&lt;/pre&gt;
+&lt;/section&gt;</description>
+        <pubDate>Sun, 19 Mar 2017 12:00:00 +0900</pubDate>
+        <link>http://toolofthought.github.com/jlang/util/fread/</link>
+        <guid isPermaLink="true">http://toolofthought.github.com/jlang/util/fread/</guid>
+        
+        
+        <category>jlang</category>
+        
+        <category>util</category>
+        
+      </item>
+    
+      <item>
+        <title>Standard Library</title>
+        <description>&lt;section&gt;
+	&lt;h2&gt;smoutput&lt;/h2&gt;
+	&lt;p&gt;&lt;a href=&quot;http://www.jsoftware.com/help/dictionary/dx001.htm&quot;&gt;&lt;code&gt;foreign 1!: &lt;/code&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2&gt;bind&lt;/h2&gt;
+	&lt;p&gt;&lt;a href=&quot;http://code.jsoftware.com/wiki/Vocabulary/quotem&quot;&gt;usage of bind&lt;/a&gt;&lt;/p&gt;
+&lt;/section&gt;
+</description>
+        <pubDate>Sun, 19 Mar 2017 12:00:00 +0900</pubDate>
+        <link>http://toolofthought.github.com/jlang/stdlib/stdlib/</link>
+        <guid isPermaLink="true">http://toolofthought.github.com/jlang/stdlib/stdlib/</guid>
+        
+        
+        <category>jlang</category>
+        
+        <category>stdlib</category>
+        
+      </item>
+    
+      <item>
+        <title>QT Install</title>
+        <description>&lt;section&gt;
+	&lt;p&gt;All-in-One 패키지를 이용해 J를 설치했다면 심플 버전 &lt;code&gt;QT library&lt;/code&gt;가 설치되어 있습니다. &lt;code&gt;OpenGL, Webview, WebSocket&lt;/code&gt; 등을 사용할 수 없으니 풀버전을 다시 설치해야 합니다.&lt;/p&gt; 
+
+	&lt;p&gt;
+		&lt;label for=&quot;mn-demo&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;
+        &lt;input type=&quot;checkbox&quot; id=&quot;mn-demo&quot; class=&quot;margin-toggle&quot;/&gt;
+        &lt;span class=&quot;marginnote&quot;&gt;
+        	source: &lt;a href=&quot;http://jsoftware.2058.n7.nabble.com/webview-on-Darwin64-Qt-IDE-1-5-2s-5-6-1-td72410.html&quot;&gt;J mailing list&lt;/a&gt;
+        &lt;/span&gt;
+        먼저 &lt;code&gt;J&lt;/code&gt;의 모든 세션을 종료하세요. 그리고 &lt;code&gt;updatejqt.bat&lt;/code&gt;을 실행하세요. 혹은 &lt;code&gt;install'qtide'&lt;/code&gt;를 실행하세요.
+    &lt;/p&gt;
+
+&lt;/section&gt;
+</description>
+        <pubDate>Sun, 19 Mar 2017 12:00:00 +0900</pubDate>
+        <link>http://toolofthought.github.com/jlang/qt/install/</link>
+        <guid isPermaLink="true">http://toolofthought.github.com/jlang/qt/install/</guid>
+        
+        
+        <category>jlang</category>
+        
+        <category>qt</category>
+        
+      </item>
+    
+      <item>
+        <title>Webview and D3</title>
+        <description>&lt;section&gt;
+	&lt;h2&gt;Streamgraph&lt;/h2&gt;
+	&lt;p&gt;&lt;code&gt;webview&lt;/code&gt;를 이용해 native로 &lt;code&gt;D3&lt;/code&gt;코드를 실행합니다.
+	&lt;figure&gt;
+        &lt;label for=&quot;webd3-streamgraph-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;webd3-streamgraph-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;/span&gt;
+        &lt;img src=&quot;/assets/img/jlang/qt/webd3-streamgraph.png&quot; alt=&quot;Image of D3 native Streamgraph Plot&quot;/&gt;
+    &lt;/figure&gt;
+	&lt;xmp class=&quot;code&quot;&gt;
+coclass 'webd3'
+
+draw =: 3 : 0
+wd 'pc browser'
+wd 'setp stylesheet * * { background-color: #fffff8; }'
+wd 'minwh 970 500'
+wd 'pas 0 0'
+wd 'cc window webview'
+wd 'pshow'
+wd 'set window baseurl *', file2url jpath '~addons'
+wd 'set window html *', HTML
+)
+
+
+HTML =: 0 : 0
+&lt;!DOCTYPE html&gt;
+&lt;meta charset=&quot;utf-8&quot;&gt;
+&lt;title&gt;Streamgraph&lt;/title&gt;
+&lt;style&gt;
+body {
+	background-color: #fffff8;
+}
+
+button {
+  position: absolute;
+  left: 10px;
+  top: 10px;
+}
+
+&lt;/style&gt;
+&lt;button onclick=&quot;transition()&quot;&gt;Update&lt;/button&gt;
+&lt;svg width=&quot;960&quot; height=&quot;500&quot;&gt;&lt;/svg&gt;
+&lt;script src=&quot;https://d3js.org/d3.v4.min.js&quot;&gt;&lt;/script&gt;
+&lt;script&gt;
+
+var n = 9, // number of layers
+    m = 200, // number of samples per layer
+    k = 10; // number of bumps per layer
+
+var stack = d3.stack().keys(d3.range(n)).offset(d3.stackOffsetWiggle),
+    layers0 = stack(d3.transpose(d3.range(n).map(function() { return bumps(m, k); }))),
+    layers1 = stack(d3.transpose(d3.range(n).map(function() { return bumps(m, k); }))),
+    layers = layers0.concat(layers1);
+
+var svg = d3.select(&quot;svg&quot;),
+    width = +svg.attr(&quot;width&quot;),
+    height = +svg.attr(&quot;height&quot;);
+
+var x = d3.scaleLinear()
+    .domain([0, m - 1])
+    .range([0, width]);
+
+var y = d3.scaleLinear()
+    .domain([d3.min(layers, stackMin), d3.max(layers, stackMax)])
+    .range([height, 0]);
+
+var z = d3.interpolateCool;
+
+var area = d3.area()
+    .x(function(d, i) { return x(i); })
+    .y0(function(d) { return y(d[0]); })
+    .y1(function(d) { return y(d[1]); });
+
+svg.selectAll(&quot;path&quot;)
+  .data(layers0)
+  .enter().append(&quot;path&quot;)
+    .attr(&quot;d&quot;, area)
+    .attr(&quot;fill&quot;, function() { return z(Math.random()); });
+
+function stackMax(layer) {
+  return d3.max(layer, function(d) { return d[1]; });
+}
+
+function stackMin(layer) {
+  return d3.min(layer, function(d) { return d[0]; });
+}
+
+function transition() {
+  var t;
+  d3.selectAll(&quot;path&quot;)
+    .data((t = layers1, layers1 = layers0, layers0 = t))
+    .transition()
+      .duration(2500)
+      .attr(&quot;d&quot;, area);
+}
+
+// Inspired by Lee Byron’s test data generator.
+function bumps(n, m) {
+  var a = [], i;
+  for (i = 0; i &lt; n; ++i) a[i] = 0;
+  for (i = 0; i &lt; m; ++i) bump(a, n);
+  return a;
+}
+
+function bump(a, n) {
+  var x = 1 / (0.1 + Math.random()),
+      y = 2 * Math.random() - 0.5,
+      z = 10 / (0.1 + Math.random());
+  for (var i = 0; i &lt; n; i++) {
+    var w = (i / n - y) * z;
+    a[i] += x * Math.exp(-w * w);
+  }
+}
+
+&lt;/script&gt;
+)
+
+browser_close =: 3 : 0
+wd 'pclose'
+)
+
+draw_webd3_ ''
+
+	&lt;/xmp&gt;
+&lt;/section&gt;
+
+</description>
+        <pubDate>Sat, 18 Mar 2017 12:00:00 +0900</pubDate>
+        <link>http://toolofthought.github.com/jlang/qt/webview-and-d3/</link>
+        <guid isPermaLink="true">http://toolofthought.github.com/jlang/qt/webview-and-d3/</guid>
+        
+        
+        <category>jlang</category>
+        
+        <category>qt</category>
+        
+      </item>
+    
+      <item>
+        <title>Window Dirver를 이용해 Plot 사용하기</title>
+        <description>require 'jzplot'
+
+stocks =: }. 'm' fread jpath '~addons/demos/wdplot/dm0396.txt'
+dat =: |: &quot;.&amp;&gt; (&lt; a:;2 3 4) { ','&amp;cut&quot;1 (- 100 &lt;. # stocks) {. stocks
+
+plotwh =: 3 : 0
+480 360 plotwh y
+:
+wd 'pc myform'
+wd 'minwh ', &quot;: x
+wd 'cc myplot isigraph flush'
+wd 'pas 0 0'
+
+loc =: ('myform'; 'myplot') conew 'jzplot'
+pd__loc 'type hilo'
+pd__loc 'color 35 139 69'
+pd__loc 'backcolor 255 255 248'
+pd__loc 'pensize 3'
+pd__loc y
+
+wd 'pshow'
+)
+
+myform_close =: 3 : 0
+wd 'pclose'
+destroy__loc ''
+)
+
+1800 600 plotwh dat</description>
+        <pubDate>Thu, 16 Mar 2017 12:00:00 +0900</pubDate>
+        <link>http://toolofthought.github.com/jlang/plot/wd-and-plot/</link>
+        <guid isPermaLink="true">http://toolofthought.github.com/jlang/plot/wd-and-plot/</guid>
+        
+        
+        <category>jlang</category>
+        
+        <category>plot</category>
+        
+      </item>
+    
+      <item>
+        <title>Plot Types</title>
+        <description>&lt;section&gt;
+	&lt;p&gt;plot 패키지의 여러 타입을 알아봅시다. &lt;a href=&quot;http://code.jsoftware.com/wiki/Plot/Types&quot;&gt;공식 사이트&lt;/a&gt;에서 상세한 내용을 찾을 수 있습니다.&lt;/p&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2&gt;Area&lt;/h2&gt;
+	&lt;p&gt;&lt;label for=&quot;area-basic-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;area-basic-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img src=&quot;/assets/img/jlang/plot/area-basic.png&quot;  alt=&quot;Image of Basic Area Plot&quot;/&gt;기본 컬러코드를 사용하는 대신 &lt;a href=&quot;http://colorbrewer2.org/#type=sequential&amp;scheme=OrRd&amp;n=9&quot;&gt;colorbrewer2.org&lt;/a&gt;에서 가져온 컬러코드를 사용합니다.&lt;/span&gt;데이터 간의 차이를 알고 싶을 때 도움이 되는 &lt;code&gt;area&lt;/code&gt;타입입니다. &lt;code&gt;matrix&lt;/code&gt;를 데이터 타입으로 다음 행과의 차이를 면적으로 표현합니다.&lt;/p&gt;
+
+	&lt;p&gt;&lt;code&gt;area&lt;/code&gt;타입은 2차원 그래프를 지원합니다.&lt;/p&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+require 'plot'
+MYCOLORS_z_ =: |. (&quot;.;._2) 0 : 0
+255 247 236
+254 232 200
+253 212 158
+253 187 132
+252 141  89
+239 101  72
+215  48  31
+179   0   0
+127   0   0
+)
+BC_z_ =: 255 255 248
+'type area; color MYCOLORS; backcolor BC' plot i. _9 20
+	&lt;/pre&gt;
+
+	&lt;h3&gt;응용: Streamgraph&lt;/h3&gt;
+	&lt;p&gt;Streamgraph는 2008년 New York Times에서 영화 흥행에 관한 &lt;a href=&quot;http://www.nytimes.com/interactive/2008/02/23/movies/20080223_REVENUE_GRAPHIC.html?_r=1&amp;&quot;&gt;데이터 비주얼라이제이션&lt;/a&gt;에 사용된 이후 큰 인기를 끌고 있습니다. &lt;code&gt;D3.js&lt;/code&gt;는 &lt;code&gt;stack layout&lt;/code&gt;에서 지원하고 있어 편리하게 사용할 수 있는 쓸모있는 비주얼라이제이션 기법입니다.&lt;/p&gt;
+
+	&lt;p&gt;먼저 random data를 만들어 주는 &lt;code&gt;bumps&lt;/code&gt;를 정의합니다. Mike Bostock의 &lt;a href=&quot;https://bl.ocks.org/mbostock/4060954&quot;&gt;Streamgraph&lt;/a&gt;와 Lee Byron의 &lt;a href=&quot;https://github.com/leebyron/streamgraph/blob/master/LateOnsetDataSource.java&quot;&gt;Streamgraph&lt;/a&gt;를 참고해 &lt;code&gt;J&lt;/code&gt;로 재작성합니다.&lt;/p&gt;
+
+	&lt;p&gt;&lt;label for=&quot;area-streamgraph-basic-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;area-streamgraph-basic-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img src=&quot;/assets/img/jlang/plot/area-streamgraph-basic.png&quot;  alt=&quot;Image of Basic Streamgraph&quot;/&gt;&lt;/span&gt;&lt;code&gt;bump&lt;/code&gt;가 제대로 돌아가는지 확인하는 코드를 실행합니다.&lt;/p&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+bump =: 3 : 0
+    m =. # y
+    A =. y
+
+    height =. % 0.1 + ? 0
+    start =. 0.5 -~ 2 * ? 0
+    duration =. 10 % 0.1 + ? 0
+
+    for_i. i. m do.
+        w =. ((i % m) - start) * duration
+        A =. ((height * ^ - *: w) + i{A) i} A
+    end.
+)
+
+n =: 9
+m =: 200
+k =: 5
+data=: |. +/\ (/: +/&quot;1) bump^:k&quot;1 (n,m) $ 0
+
+require 'plot'
+MYCOLORS_z_ =: |. (&quot;.;._2) 0 : 0
+255 247 236
+254 232 200
+253 212 158
+253 187 132
+252 141  89
+239 101  72
+215  48  31
+179   0   0
+127   0   0
+)
+BC_z_ =: 255 255 248
+
+'type area; color MYCOLORS; backcolor BC' plot data
+	&lt;/pre&gt;
+
+	&lt;p&gt;&lt;label for=&quot;area-streamgraph-silhouette-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;area-streamgraph-silhouette-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img src=&quot;/assets/img/jlang/plot/area-streamgraph-silhouette.png&quot;  alt=&quot;Image of Silhouette Streamgraph&quot;/&gt;&lt;/span&gt;위의 예에서 base line \( G_0 = 0\) 으로 가정하고 따로 처리하지 않았습니다. 이제 베이스 라인을 조정해 같은 데이터로 다른 streamgraph를 만들어봅시다. &lt;code&gt;silhouette&lt;/code&gt;이라고 불리는 기법은 각 데이터 포인트의 streamgraph 전체 높이 제곱의 합을 최소화 하는 기법입니다.
+	$$ G_0 =  - \frac{1}{2} \prod_{i=1} ^n f_i =  - \frac{1}{2} G_n \ldotp $$
+	&lt;/span&gt;&lt;code&gt;silhouette&lt;/code&gt;을 이용해 Streamgraph를 그려봅시다.
+	&lt;/p&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+bump =: 3 : 0
+    m =. # y
+    A =. y
+
+    height =. % 0.1 + ? 0
+    start =. 0.5 -~ 2 * ? 0
+    duration =. 10 % 0.1 + ? 0
+
+    for_i. i. m do.
+        w =. ((i % m) - start) * duration
+        A =. ((height * ^ - *: w) + i{A) i} A
+    end.
+)
+
+n =: 9
+m =: 200
+k =: 5
+data=: |. +/\ (/: +/&quot;1) bump^:k&quot;1 (n,m) $ 0
+g0 =: - -: {. data 
+
+require 'plot'
+MYCOLORS_z_ =: |. (&quot;.;._2) 0 : 0
+255 255 248
+255 247 236
+254 232 200
+253 212 158
+253 187 132
+252 141  89
+239 101  72
+215  48  31
+179   0   0
+127   0   0
+)
+BC_z_ =: 255 255 248
+map =: 4 : 0
+'a b c d' =. x
+values =. y
+(values - a) * (d - c) % (b - a)
+)
+
+sdata =: data (-&quot;1 , ] ) g0
+'smin smax' =: (&lt;./ , &gt;./) , sdata 
+
+'type area; color MYCOLORS; backcolor BC; noaxes' plot (smin , smax, 0, 100)&amp;map sdata
+	&lt;/pre&gt;
+
+
+	&lt;p&gt;&lt;label for=&quot;area-streamgraph-wiggle-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;area-streamgraph-wiggle-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img src=&quot;/assets/img/jlang/plot/area-streamgraph-wiggle.png&quot;  alt=&quot;Image of Wiggle Streamgraph&quot;/&gt;&lt;/span&gt;Streamgraph는 여러가지 layout을 제공하는데 가장 많이 쓰이는 &lt;code&gt;wiggle&lt;/code&gt; 레이아웃을 추가로 적용해 보겠습니다. &lt;code&gt;wiggle&lt;/code&gt;을 어떻게 구현하는지를 이해하는데 다음의 두 자료가 큰 도움이 됩니다. &lt;a href=&quot;http://leebyron.com/streamgraph/stackedgraphs_byron_wattenberg.pdf&quot;&gt;Lee Byron &amp; Martin Wattenberg&lt;/a&gt;이 기본 아이디어를 이해하는데 도움을 줍니다. 약간 다른 시각의 글로 &lt;a href=&quot;http://yifanhu.net/PUB/StreamGraph.pdf&quot;&gt;Marco Di Bartolomeo &amp; Yifan Hu&lt;/a&gt;의 작업이 있습니다. &lt;/p&gt;
+
+	&lt;p&gt;&lt;code&gt;wiggle&lt;/code&gt;을 간단히 소개하자면 각각의 누적 그래프 선 변화율의 합이 최소가 되도록 베이스 라인  \( G_0 \) 을 조절하는 기법입니다. 자세한 내용은 위의 두 자료를 참고하세요.&lt;/p&gt;
+
+	&lt;pre class=&quot;code&quot;&gt;
+bump =: 3 : 0
+    m =. # y
+    A =. y
+
+    height =. % 0.1 + ? 0
+    start =. 0.5 -~ 2 * ? 0
+    duration =. 10 % 0.1 + ? 0
+
+    for_i. i. m do.
+        w =. ((i % m) - start) * duration
+        A =. ((height * ^ - *: w) + i{A) i} A
+    end.
+)
+
+n =: 9
+m =: 200
+k =: 5
+fs =: bump^:k&quot;1 (n,m) $ 0
+g0 =: (-&gt;:#fs) %~ +/ (&gt;: i. - # fs) * fs 
+
+require 'plot'
+MYCOLORS_z_ =: |. (&quot;.;._2) 0 : 0
+255 255 248
+255 247 236
+254 232 200
+253 212 158
+253 187 132
+252 141  89
+239 101  72
+215  48  31
+179   0   0
+127   0   0
+)
+BC_z_ =: 255 255 248
+map =: 4 : 0
+'a b c d' =. x
+values =. y
+(values - a) * (d - c) % (b - a)
+)
+
+wdata =: |. +/\ g0 , fs
+'wmin wmax' =: (&lt;./ , &gt;./) , wdata 
+
+'type area; color MYCOLORS; backcolor BC; noaxes' plot (wmin , wmax, 0, 100)&amp;map wdata
+
+	&lt;/pre&gt;
+	&lt;h3&gt;D3 Streamgraph&lt;/h3&gt;
+	&lt;p&gt;&lt;code&gt;qt webview&lt;/code&gt;를 사용해 &lt;code&gt;d3.js&lt;/code&gt;라이브러리를 네이티브로 실행할 수 있습니다. 자세한 내용은 &lt;a href=&quot;/jlang/qt/webview-and-d3/&quot;&gt;링크&lt;/a&gt;를 참조하세요.&lt;/p&gt;
+&lt;/section&gt;
+&lt;section&gt;
+	&lt;h2&gt;Bar&lt;/h2&gt;
+	&lt;p&gt;&lt;label for=&quot;bar-basic-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;bar-basic-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img src=&quot;/assets/img/jlang/plot/bar-basic.png&quot;  alt=&quot;Image of Basic Bar Plot&quot;/&gt;&lt;/span&gt;막대 그래프 그래프를 그려봅시다. 이번에는 &lt;code&gt;plot&lt;/code&gt;을 사용하는 대신 &lt;a href=&quot;http://code.jsoftware.com/wiki/Plot/Verbs&quot;&gt;&lt;code&gt;pd&lt;/code&gt;명령&lt;/a&gt;을 사용하겠습니다.&lt;/p&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+require 'plot'
+
+MYCOLORS_z_ =: &quot;.;._2 ] 0 : 0 
+252 251 253
+239 237 245
+218 218 235
+188 189 220
+158 154 200
+128 125 186
+106  81 163
+ 84  39 143
+ 63   0 125
+)
+BC_z_ =: 255 255 248
+
+pd 'reset'
+pd 'type bar'
+pd 'color MYCOLORS'
+pd 'axes 1 0'
+pd 'xlabel ',&quot;:2001+i.6
+pd 'backcolor BC'
+pd 0.6 0.8 1 * _0.5+?.3#,:3 3 4 7 7 4
+pd 'show'
+	&lt;/pre&gt;
+
+	&lt;h3&gt;Stacked Bar&lt;/h3&gt;
+	&lt;p&gt;&lt;label for=&quot;bar-sbar-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;bar-sbar-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img src=&quot;/assets/img/jlang/plot/bar-sbar.png&quot;  alt=&quot;Image of Stacked Bar Plot&quot;/&gt;&lt;/span&gt;데이터를 그룹지어 표시하는 대신 하나의 축에 쌓아서 보여줄 수 있습니다. &lt;code&gt;sbar&lt;/code&gt;타입을 사용하면 그래프를 쉽게 그릴 수 있습니다. &lt;code&gt;sbar&lt;/code&gt;를 사용할 때 마이너스 값을 사용할 수 없다는 점을 주의하세요.&lt;/p&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+require 'plot'
+
+MYCOLORS_z_ =: &quot;.;._2 ] 0 : 0 
+224 236 244
+158 188 218
+136 86 167
+)
+BC_z_ =: 255 255 248
+
+pd 'reset'
+pd 'type sbar'
+pd 'color MYCOLORS'
+pd 'ytic 2 0'
+pd 'xlabel ',&quot;:2001+i.5
+pd 'backcolor BC'
+pd 0.6 0.8 1* &gt;:?.3#,:3 3 4 7 7
+pd 'show'
+
+	&lt;/pre&gt;
+	&lt;h3&gt;Floating Stacked Bar&lt;/h3&gt;
+	&lt;p&gt;&lt;label for=&quot;bar-fbar-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;bar-fbar-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img src=&quot;/assets/img/jlang/plot/bar-fbar.png&quot;  alt=&quot;Image of Floating Stacked Bar Plot&quot;/&gt;&lt;code&gt;MYCOLORS&lt;/code&gt;의 순서가 &lt;code&gt;sbar&lt;/code&gt;의 사례와 다른 것에 주의하세요.&lt;/span&gt;&lt;code&gt;fbar&lt;/code&gt;는 모든 점에서 &lt;code&gt;sbar&lt;/code&gt;와 동일하지만 가장 아래 데이터 레이어가 투명으로 처리됩니다.&lt;/p&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+require 'plot'
+
+MYCOLORS_z_ =: &quot;.;._2 ] 0 : 0 
+158 188 218
+136 86 167
+224 236 244
+)
+BC_z_ =: 255 255 248
+
+pd 'reset'
+pd 'type fbar'
+pd 'color MYCOLORS'
+pd 'ytic 2 0'
+pd 'xlabel ',&quot;:2001+i.5
+pd 'backcolor BC'
+pd 0.6 0.8 1* &gt;:?.3#,:3 3 4 7 7
+pd 'show'
+	&lt;/pre&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2&gt;Contour&lt;/h2&gt;
+	&lt;p&gt;&lt;label for=&quot;contour-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;contour-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img src=&quot;/assets/img/jlang/plot/contour.png&quot;  alt=&quot;Image of Contour Plot&quot;/&gt;$$ z = x^2 - y^2. $$&lt;/span&gt;3차원 그래프를 평면에 투사한 등고선 그래프입니다.&lt;/p&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+require 'plot numeric'
+BC_z_ =: 255 255 248
+X =: Y =: steps _4 4 100
+Z =: X -&amp;*:/ Y
+
+pd 'reset'
+pd 'type contour'
+pd 'color MYCOLORS'
+pd 'xtic 2 1'
+pd 'ytic 2 0'
+pd 'backcolor BC'
+pd X ; Y ; Z
+pd 'show'
+	&lt;/pre&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2&gt;Density&lt;/h2&gt;
+	&lt;p&gt;3차원 데이터를 2차원에 표현하는 여러 방법 중 하나로 색상에 따라 값의 크기를 짐작할 수 있는 그래프입니다.&lt;/p&gt;
+
+	&lt;p&gt;아래에 \( z = x^2 - y^2 \) 그래프를 &lt;code&gt;surface&lt;/code&gt;와 &lt;code&gt;density&lt;/code&gt; 두가지 방법으로 그려보았습니다.&lt;/p&gt;
+	&lt;figure&gt;
+        &lt;label for=&quot;surface-density-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;surface-density-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;/span&gt;
+        &lt;img src=&quot;/assets/img/jlang/plot/surface-density.png&quot; alt=&quot;Image of Surface and Density Plot&quot;/&gt;
+    &lt;/figure&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+MYCOLORS_z_ =: &quot;.;._2 (0 : 0)
+255 247 251
+236 231 242
+208 209 230
+166 189 219
+116 169 207
+54 144 192
+5 112 176
+4 90 141
+2 56 88
+)
+BC_z_ =: 255 255 248
+
+require 'plot numeric'
+X =: steps _4 4 8
+dat =: (; (; -&amp;*:/~)) X
+
+pd 'reset'
+pd 'backcolor BC'
+
+pd 'new 30 200 480 900' NB. bottom x, bottom y, top x, top y
+pd 'type surface'
+pd 'color MYCOLORS'
+pd 'backcolor BC'
+pd 'noaxes'
+pd dat
+pd 'new 510 200 960 900' NB. bottom x, bottom y, top x, top y
+pd 'type density'
+pd 'color MYCOLORS'
+pd 'backcolor BC'
+pd 'noaxes'
+pd 'aspect 1'
+pd dat
+
+pd 'show'
+	&lt;/pre&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2&gt;Dot&lt;/h2&gt;
+	&lt;p&gt;&lt;code&gt;dot&lt;/code&gt;차트는 특별히 자료를 가공하는 대신 자료의 값을 좌표삼아 평면에 뿌리는 차트입니다. 임의의 데이터를 사용하는 대신 실제 연구결과를 사용해 봅시다. &lt;code&gt;dot&lt;/code&gt; 차트 중 가장 유명한 것이라면 아무래도 &lt;a href=&quot;https://en.wikipedia.org/wiki/Francis_Galton&quot;&gt;골턴&lt;/a&gt;의 실험이 아닌가 합니다. 골턴이 한 연구 중 가장 유명한 것은 부모의 키와 자녀의 키사이의 관계를 추적한 연구입니다. 실제 데이터를 구해 &lt;code&gt;dot&lt;/code&gt;차트를 이용해 직접 역사적인 실험을 재현해 봅시다.&lt;/p&gt;
+	&lt;figure&gt;
+        &lt;label for=&quot;dot-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;dot-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;source:  &lt;a href=&quot;http://www.math.uah.edu/stat/data/Galton.html&quot;&gt;Random&lt;/a&gt;&lt;/span&gt;
+        &lt;img src=&quot;/assets/img/jlang/plot/dot.png&quot; alt=&quot;Relationship between father's height and son's one&quot;/&gt;
+    &lt;/figure&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+require 'web/gethttp plot'
+txt =: gethttp 'http://www.math.uah.edu/stat/data/Galton.csv'
+M =: (#~ (&lt;,:'M') = (&lt; a:;3)&amp;{) ','&amp;cutopen ;._2 txt , CR
+
+X =: ; &quot;. L: 0 (&lt; a:;1) { M 	NB. 아버지 키 in inch
+Y =: ; &quot;. L: 0 (&lt; a:;4) { M 	NB. 아들 키 in inch
+
+MYCOLORS_z_ =: 0 109 44 ,: 199 233 192
+BC_z_ =: 255 255 248
+
+pd 'reset'
+pd 'type dot'
+pd 'color MYCOLORS'
+pd 'backcolor BC'
+pd 'pensize 5'
+pd 'aspect 1'
+pd 'xcaption father''s height'
+pd 'ycaption son''s height'
+pd X ; Y
+
+pd 'show'
+
+	&lt;/pre&gt;
+	&lt;p&gt;아버지 키와 아들 키 간의 관계가 잘 보이십니까? 골턴의 연구는 정묘한 수학적 증명으로 이어지지는 못했지만 많은 사람들에게 특히 회귀분석을 접하는 사람들에게 많은 영감을 주고 있습니다.&lt;/p&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2&gt;Errorbar&lt;/h2&gt;
+	&lt;p&gt;&lt;label for=&quot;errorbar-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;errorbar-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img src=&quot;/assets/img/jlang/plot/errorbar.png&quot;  alt=&quot;Image of Errorbar Plot&quot;/&gt;&lt;/span&gt;&lt;code&gt;errorbar&lt;/code&gt; 차트는 3개의 행을 입력으로 받습니다. &lt;code&gt;hi&lt;/code&gt;, &lt;code&gt;mid&lt;/code&gt; 그리고 &lt;code&gt;low&lt;/code&gt;행이 차례로 &lt;code&gt;errorbar&lt;/code&gt;의 입력을 구성합니다. &lt;code&gt;mid&lt;/code&gt;는 &lt;code&gt;line&lt;/code&gt;으로 표시되고 &lt;code&gt;hi&lt;/code&gt;와 &lt;code&gt;lo&lt;/code&gt;는 가로 방향 선분으로 표시되어 &lt;code&gt;hi&lt;/code&gt;와 &lt;code&gt;lo&lt;/code&gt;가 얼마나 차이나는지 알 수 있게 합니다.&lt;/p&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+require 'plot numeric'
+
+mid=. _5 + (?21#10) + 10*sin steps 0 3 20
+hi=. mid+0.5+?21#5
+lo=. mid-0.5+?21#5
+
+pd 'reset'
+pd 'color 35 139 69'
+pd 'backcolor 255 255 248'
+pd 'type errorbar'
+pd 'pensize 3'
+pd  hi,mid,:lo
+pd 'show'
+	&lt;/pre&gt;
+&lt;/section&gt;
+&lt;section&gt;
+	&lt;h2&gt;Hilo&lt;/h2&gt;
+	&lt;p&gt;&lt;code&gt;hilo&lt;/code&gt;차트는 &lt;code&gt;hi lo close&lt;/code&gt; 세 개 행을 입력으로 받습니다. 예를 들어 주가 정보를 차트로 그릴 때 그날의 가장 높은 가격은 &lt;code&gt;hi&lt;/code&gt;, 가장 낮은 가격은 &lt;code&gt;lo&lt;/code&gt; 그리고 마감 시간 가격 &lt;code&gt;close&lt;/code&gt;로 하면 매일의 시장 가격 움직임을 쉽게 이해할 수 있습니다.&lt;/p&gt;
+
+	&lt;p&gt;아래 예제는 1996년 3월 독일 마르크 선물 가격의 &lt;code&gt;hilo&lt;/code&gt;그래프입니다. &lt;code&gt;window driver&lt;/code&gt;를 이용해 그래프의 크기를 지정하는 예제와 &lt;code&gt;hilo&lt;/code&gt;의 예제가 섞여 있습니다.&lt;/p&gt;
+	&lt;figure class=&quot;fullwidth&quot;&gt;
+        &lt;img src=&quot;/assets/img/jlang/plot/hilo.png&quot; alt=&quot;March 1996 Deutsche Mark Future&quot;/&gt;
+    &lt;/figure&gt;
+
+	&lt;pre class=&quot;code&quot;&gt;
+require 'plot'
+
+stocks =: }. 'm' fread jpath '~addons/demos/wdplot/dm0396.txt'
+dat =: |: &quot;.&amp;&gt; (&lt; a:;2 3 4) { ','&amp;cut&quot;1 (- 100 &lt;. # stocks) {. stocks
+
+pd 'reset'
+pd 'type hilo'
+pd 'color 35 139 69'
+pd 'backcolor 255 255 248'
+pd 'pensize 3'
+pd dat
+pd 'show'
+
+	&lt;/pre&gt;
+
+	&lt;p&gt;만약 파일로 저장하려면 &lt;code&gt;qtc&lt;/code&gt; 명령을 사용하면 편리합니다.
+	&lt;pre class=&quot;code&quot;&gt;
+require 'plot'
+
+stocks =: }. 'm' fread jpath '~addons/demos/wdplot/dm0396.txt'
+dat =: |: &quot;.&amp;&gt; (&lt; a:;2 3 4) { ','&amp;cut&quot;1 (- 100 &lt;. # stocks) {. stocks
+
+pd 'reset'
+pd 'type hilo'
+pd 'color 35 139 69'
+pd 'backcolor 255 255 248'
+pd 'pensize 3'
+pd dat
+pd 'qtc 1800 600 ', jpath '~temp/qtc-shortcut.png'
+	&lt;/pre&gt;
+
+&lt;/section&gt;
+&lt;section&gt;
+	&lt;h2&gt;Surface&lt;/h2&gt;
+	&lt;p&gt;&lt;label for=&quot;surface-figure&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;surface-figure&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img src=&quot;/assets/img/jlang/plot/surface.png&quot;  alt=&quot;Image of Surface Plot&quot;/&gt;$$ z = x^2 - y^2. $$&lt;/span&gt;3차원 데이터를 그릴 때 도움이 되는 &lt;code&gt;surface&lt;/code&gt;타입입니다. 3차원 그래프의 기본타입으로 지정되어 있습니다. 따로 타입을 정하지 않는다면 &lt;code&gt;surface&lt;/code&gt;플롯을 그립니다.&lt;/p&gt;
+
+	&lt;p&gt;&lt;code&gt;surface&lt;/code&gt;타입은 3차원 그래프를 지원됩니다.&lt;/p&gt;
+	
+	
+	&lt;pre class=&quot;code&quot;&gt;
+MYCOLORS_z_ =: &quot;.;._2 (0 : 0)
+247 252 253
+224 236 244
+191 211 230
+158 188 218
+140 150 198
+140 107 177
+136 65 157
+129 15 124
+77 0 75
+)
+require 'plot numeric'
+X =: Y =: steps _4 4 8
+Z =: X -&amp;*:/ Y
+BC_z_ =: 255 255 248 NB. plot 배경색, 꼭 locale을 _z_로 지정하세요.
+'type surface; boxed 0; mesh 0; backcolor BC; color MYCOLORS' plot X ; Y ; Z
+	&lt;/pre&gt;
+&lt;/section&gt;
+
+
+	</description>
+        <pubDate>Thu, 16 Mar 2017 12:00:00 +0900</pubDate>
+        <link>http://toolofthought.github.com/jlang/plot/types/</link>
+        <guid isPermaLink="true">http://toolofthought.github.com/jlang/plot/types/</guid>
+        
+        
+        <category>jlang</category>
+        
+        <category>plot</category>
+        
+      </item>
+    
+      <item>
+        <title>Tufte CSS</title>
+        <description>&lt;section&gt;
+	&lt;p&gt;Tufte CSS provides tools to style web articles using the ideas demonstrated by Edward Tufte’s books and handouts. Tufte’s style is known for its simplicity, extensive use of sidenotes, tight integration of graphics with text, and carefully chosen typography.&lt;/p&gt;
+	&lt;p&gt;Tufte CSS was created by &lt;a href=&quot;http://www.daveliepmann.com&quot;&gt;Dave Liepmann&lt;/a&gt; and is now an Edward Tufte project. The original idea was cribbed from &lt;a href=&quot;https://tufte-latex.github.io/tufte-latex/&quot;&gt;Tufte-&lt;span class=&quot;latex&quot;&gt;L&lt;span class=&quot;latex-sup&quot;&gt;a&lt;/span&gt;T&lt;span class=&quot;latex-sub&quot;&gt;e&lt;/span&gt;X&lt;/span&gt;&lt;/a&gt; and &lt;a href=&quot;http://rmarkdown.rstudio.com/tufte_handout_format.html&quot;&gt;R Markdown’s Tufte Handout format&lt;/a&gt;. We give hearty thanks to all the people who have contributed to those projects.&lt;/p&gt;
+	&lt;p&gt;If you see anything that Tufte CSS could improve, we welcome your contribution in the form of an issue or pull request on the GitHub project: &lt;a href=&quot;https://github.com/edwardtufte/tufte-css&quot;&gt;tufte-css&lt;/a&gt;. Please note the &lt;a href=&quot;https://github.com/edwardtufte/tufte-css#contributing&quot;&gt;contribution guidelines&lt;/a&gt;.&lt;/p&gt;
+	&lt;p&gt;Finally, a reminder about the goal of this project. The web is not print. Webpages are not books. Therefore, the goal of Tufte CSS is not to say “websites should look like this interpretation of Tufte’s books” but rather “here are some techniques Tufte developed that we’ve found useful in print; maybe you can find a way to make them useful on the web”. Tufte CSS is merely a sketch of one way to implement this particular set of ideas. It should be a starting point, not a design goal, because any project should present their information as best suits their particular circumstances.&lt;/p&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2 id=&quot;getting-started&quot;&gt;Getting Started&lt;/h2&gt;
+	&lt;p&gt;To use Tufte CSS, copy &lt;code&gt;tufte.css&lt;/code&gt; and the &lt;code&gt;et-book&lt;/code&gt; directory of font files to your project directory, then add the following to your HTML document’s &lt;code&gt;head&lt;/code&gt; block:&lt;/p&gt;
+
+	&lt;pre class=&quot;code&quot;&gt;&amp;lt;link rel=&quot;stylesheet&quot; href=&quot;tufte.css&quot;/&amp;gt;&lt;/pre&gt;
+
+	&lt;p&gt;Now you just have to use the provided CSS rules, and the Tufte CSS conventions described in this document. For best results, View Source and Inspect Element frequently.&lt;/p&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2 id=&quot;fundamentals&quot;&gt;Fundamentals&lt;/h2&gt;
+	&lt;h3 id=&quot;fundamentals--sections-and-headers&quot;&gt;Sections and Headings&lt;/h3&gt;
+	&lt;p&gt;Organize your document with an &lt;code&gt;article&lt;/code&gt; element inside your &lt;code&gt;body&lt;/code&gt; tag. Inside that, use &lt;code&gt;section&lt;/code&gt; tags around each logical grouping of text and headings.&lt;/p&gt;
+	&lt;p&gt;Tufte CSS uses &lt;code&gt;h1&lt;/code&gt; for the document title, &lt;code&gt;p&lt;/code&gt; with class &lt;code&gt;subtitle&lt;/code&gt; for the document subtitle, &lt;code&gt;h2&lt;/code&gt; for section headings, and &lt;code&gt;h3&lt;/code&gt; for low-level headings. More specific headings are not supported. If you feel the urge to reach for a heading of level 4 or greater, consider redesigning your document:&lt;/p&gt;
+	&lt;blockquote cite=&quot;http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0000hB&quot;&gt;
+		&lt;p&gt;[It is] notable that the Feynman lectures (3 volumes) write about all of physics in 1800 pages, using only 2 levels of hierarchical headings: chapters and A-level heads in the text. It also uses the methodology of &lt;em&gt;sentences&lt;/em&gt; which then cumulate sequentially into &lt;em&gt;paragraphs&lt;/em&gt;, rather than the grunts of bullet points. Undergraduate Caltech physics is very complicated material, but it didn’t require an elaborate hierarchy to organize.&lt;/p&gt;
+		&lt;footer&gt;&lt;a href=&quot;http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0000hB&quot;&gt;Edward Tufte, forum post, ‘Book design: advice and examples’ thread&lt;/a&gt;&lt;/footer&gt;
+	&lt;/blockquote&gt;
+	&lt;p&gt;As a bonus, this excerpt regarding the use of headings provides an example of block quotes. In Tufte CSS they are just lightly styled, semantically correct HTML using &lt;code&gt;blockquote&lt;/code&gt; and &lt;code&gt;footer&lt;/code&gt; elements. See page 20 of &lt;a href=&quot;https://www.edwardtufte.com/tufte/books_vdqi&quot;&gt;The Visual Display of Quantitative Information&lt;/a&gt; for an example in print.&lt;/p&gt;
+	&lt;p&gt;&lt;span class=&quot;newthought&quot;&gt;In his later books&lt;label for=&quot;sn-in-his-later-books&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;/span&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-in-his-later-books&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;&lt;a href=&quot;http://www.edwardtufte.com/tufte/books_be&quot;&gt;&lt;em&gt;Beautiful Evidence&lt;/em&gt;&lt;/a&gt;&lt;/span&gt;, Tufte starts each section with a bit of vertical space, a non-indented paragraph, and the first few words of the sentence set in small caps. For this we use a span with the class &lt;code&gt;newthought&lt;/code&gt;, as demonstrated at the beginning of this paragraph. Vertical spacing is accomplished separately through &lt;code&gt;&amp;lt;section&amp;gt;&lt;/code&gt; tags. Be consistent: though we do so in this paragraph for the purpose of demonstration, do not alternate use of header elements and the &lt;code&gt;newthought&lt;/code&gt; technique. Pick one approach and stick to it.&lt;/p&gt;
+
+	&lt;h3 id=&quot;fundamentals--text&quot;&gt;Text&lt;/h3&gt;
+	&lt;p&gt;Although paper handouts obviously have a pure white background, the web is better served by the use of slightly off-white and off-black colors. Tufte CSS uses &lt;code&gt;#fffff8&lt;/code&gt; and &lt;code&gt;#111111&lt;/code&gt; because they are nearly indistinguishable from their ‘pure’ cousins, but dial down the harsh contrast. We stick to the greyscale for text, reserving color for specific, careful use in figures and images.&lt;/p&gt;
+	&lt;p&gt;In print, Tufte has used the proprietary Monotype Bembo&lt;label for=&quot;sn-proprietary-monotype-bembo&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-proprietary-monotype-bembo&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;See Tufte’s comment in the &lt;a href=&quot;http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0000Vt&quot;&gt;Tufte book fonts&lt;/a&gt; thread.&lt;/span&gt; font. A similar effect is achieved in digital formats with the now open-source &lt;a href=&quot;https://github.com/edwardtufte/et-book&quot;&gt;ETBook&lt;/a&gt;, which Tufte CSS supplies with a &lt;code&gt;@font-face&lt;/code&gt; reference to a .ttf file. In case ETBook somehow doesn’t work, Tufte CSS shifts gracefully to other serif fonts like Palatino and Georgia.&lt;/p&gt;
+	&lt;p&gt;Also notice how Tufte CSS includes separate font files for bold (strong) and italic (emphasis), instead of relying on the browser to mechanically transform the text. This is typographic best practice.&lt;/p&gt;
+	&lt;p class=&quot;sans&quot;&gt;If you prefer sans-serifs, use the &lt;code&gt;sans&lt;/code&gt; class. It relies on Gill Sans, Tufte’s sans-serif font of choice.&lt;/p&gt;
+	&lt;p&gt;Links in Tufte CSS match the body text in color and do not change on mouseover or when clicked. Here is a &lt;a href=&quot;#&quot;&gt;dummy example&lt;/a&gt; that goes nowhere. These links are underlined, since this is the most widely recognized indicator of clickable text. &lt;label for=&quot;mn-blue-links&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;mn-blue-links&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;Blue text, while also a widely recognizable clickable-text indicator, is crass and distracting. Luckily, it is also rendered unnecessary by the use of underlining.&lt;/span&gt; However, because most browsers’ default underlining does not clear descenders and is so thick and distracting, the underline effect is instead achieved using CSS trickery involving background gradients instead of standard &lt;code&gt;text-decoration&lt;/code&gt;. Credit goes to Adam Schwartz for that technique.&lt;/p&gt;
+	&lt;p&gt;As always, these design choices are merely one approach that Tufte CSS provides by default. Other approaches, such as changing color on click or mouseover, or using highlighting or color instead of underlining to denote links, could also be made to work. The goal is to make sentences readable without interference from links, as well as to make links immediately identifiable even by casual web users.&lt;/p&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2 id=&quot;epigraphs&quot;&gt;Epigraphs&lt;/h2&gt;
+	&lt;div class=&quot;epigraph&quot;&gt;
+		&lt;blockquote&gt;
+			&lt;p&gt;The English language . . . becomes ugly and inaccurate because our thoughts are foolish, but the slovenliness of our language makes it easier for us to have foolish thoughts.&lt;/p&gt;
+			&lt;footer&gt;George Orwell, “Politics and the English Language”&lt;/footer&gt;
+		&lt;/blockquote&gt;
+		&lt;blockquote&gt;
+			&lt;p&gt;For a successful technology, reality must take precedence over public relations, for Nature cannot be fooled.&lt;/p&gt;
+			&lt;footer&gt;Richard P. Feynman, &lt;cite&gt;“What Do You Care What Other People Think?”&lt;/cite&gt;&lt;/footer&gt;
+		&lt;/blockquote&gt;
+		&lt;blockquote&gt;I do not paint things, I paint only the differences between things.&lt;footer&gt;Henri Matisse, &lt;cite&gt;Henri Matisse Dessins: thèmes et variations&lt;/cite&gt; (Paris, 1943), 37&lt;/footer&gt;&lt;/blockquote&gt;
+	&lt;/div&gt;
+	&lt;p&gt;If you’d like to introduce your page or a section of your page with some quotes, use epigraphs. Modeled after chapter epigraphs in Tufte’s books (particularly &lt;em&gt;Beautiful Evidence&lt;/em&gt;), these are &lt;code&gt;blockquote&lt;/code&gt; elements with a bit of specialized styling. Quoted text is italicized. The source goes in a &lt;code&gt;footer&lt;/code&gt; element inside the &lt;code&gt;blockquote&lt;/code&gt;. We have provided three examples in the epigraph of this section, demonstrating shorter and longer quotes, with and without a paragraph tag, and showing how multiple quotes within an epigraph fit together with the use of a wrapper class.&lt;/p&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2 id=&quot;sidenotes&quot;&gt;Sidenotes: Footnotes and Marginal Notes&lt;/h2&gt;
+	&lt;p&gt;One of the most distinctive features of Tufte’s style is his extensive use of sidenotes.&lt;label for=&quot;sn-extensive-use-of-sidenotes&quot; class=&quot;margin-toggle sidenote-number&quot;&gt;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;sn-extensive-use-of-sidenotes&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;sidenote&quot;&gt;This is a sidenote.&lt;/span&gt; Sidenotes are like footnotes, except they don’t force the reader to jump their eye to the bottom of the page, but instead display off to the side in the margin. Perhaps you have noticed their use in this document already. You are very astute.&lt;/p&gt;
+	&lt;p&gt;Sidenotes are a great example of the web not being like print. On sufficiently large viewports, Tufte CSS uses the margin for sidenotes, margin notes, and small figures. On smaller viewports, elements that would go in the margin are hidden until the user toggles them into view. The goal is to present related but not necessary information such as asides or citations &lt;em&gt;as close as possible&lt;/em&gt; to the text that references them. At the same time, this secondary information should stay out of the way of the eye, not interfering with the progression of ideas in the main text.&lt;/p&gt;
+	&lt;p&gt;Sidenotes consist of two elements: a superscript reference number that goes inline with the text, and a sidenote with content. To add the former, just put a label and dummy checkbox into the text where you want the reference to go, like so:&lt;/p&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+&amp;lt;label for=&quot;sn-demo&quot;
+ class=&quot;margin-toggle sidenote-number&quot;&amp;gt;
+&amp;lt;/label&amp;gt;
+&amp;lt;input type=&quot;checkbox&quot;
+ id=&quot;sn-demo&quot;
+ class=&quot;margin-toggle&quot;/&amp;gt;&lt;/pre&gt;
+	&lt;p&gt;You must manually assign a reference &lt;code&gt;id&lt;/code&gt; to each side or margin note, replacing “sn-demo” in the &lt;code&gt;for&lt;/code&gt; and the &lt;code&gt;id&lt;/code&gt; attribute values with an appropriate descriptor. It is useful to use prefixes like &lt;code&gt;sn-&lt;/code&gt; for sidenotes and &lt;code&gt;mn-&lt;/code&gt; for margin notes.&lt;/p&gt;
+	&lt;p&gt;Immediately adjacent to that sidenote reference in the main text goes the sidenote content itself, in a &lt;code&gt;span&lt;/code&gt; with class &lt;code&gt;sidenote&lt;/code&gt;. This tag is also inserted directly in the middle of the body text, but is either pushed into the margin or hidden by default. Make sure to position your sidenotes correctly by keeping the sidenote-number label close to the sidenote itself.&lt;/p&gt;
+	&lt;p&gt;If you want a sidenote without footnote-style numberings, then you want a margin note.
+		&lt;label for=&quot;mn-demo&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;
+		&lt;input type=&quot;checkbox&quot; id=&quot;mn-demo&quot; class=&quot;margin-toggle&quot;/&gt;
+		&lt;span class=&quot;marginnote&quot;&gt;
+			This is a margin note. Notice there isn’t a number preceding the note.
+		&lt;/span&gt; On large screens, a margin note is just a sidenote that omits the reference number. This lessens the distracting effect taking away from the flow of the main text, but can increase the cognitive load of matching a margin note to its referent text. However, on small screens, a margin note is like a sidenote except its viewability-toggle is a symbol rather than a reference number. This document currently uses the symbol &amp;#8853; (&lt;code&gt;&amp;amp;#8853;&lt;/code&gt;), but it’s up to you.&lt;/p&gt;
+	&lt;p&gt;Margin notes are created just like sidenotes, but with the &lt;code&gt;marginnote&lt;/code&gt; class for the content and the &lt;code&gt;margin-toggle&lt;/code&gt; class for the label and dummy checkbox. For instance, here is the code for the margin note used in the previous paragraph:&lt;/p&gt;
+	&lt;pre class=&quot;code&quot;&gt;
+&amp;lt;label for=&quot;mn-demo&quot; class=&quot;margin-toggle&quot;&amp;gt;&amp;amp;#8853;&amp;lt;/label&amp;gt;
+&amp;lt;input type=&quot;checkbox&quot; id=&quot;mn-demo&quot; class=&quot;margin-toggle&quot;/&amp;gt;
+&amp;lt;span class=&quot;marginnote&quot;&amp;gt;
+This is a margin note. Notice there isn’t a number preceding the note.
+&amp;lt;/span&amp;gt;&lt;/pre&gt;
+	&lt;p&gt;Figures in the margin are created as margin notes, as demonstrated in the next section.&lt;/p&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2 id=&quot;figures&quot;&gt;Figures&lt;/h2&gt;
+	&lt;p&gt;Tufte emphasizes tight integration of graphics with text. Data, graphs, and figures are kept with the text that discusses them. In print, this means they are not relegated to a separate page. On the web, that means readability of graphics and their accompanying text without extra clicks, tab-switching, or scrolling.&lt;/p&gt;
+	&lt;p&gt;Figures should try to use the &lt;code&gt;figure&lt;/code&gt; element, which by default are constrained to the main column. Don’t wrap figures in a paragraph tag. Any label or margin note goes in a regular margin note inside the figure. For example, most of the time one should introduce a figure directly into the main flow of discussion, like so:&lt;/p&gt;
+	&lt;figure&gt;
+		&lt;label for=&quot;mn-exports-imports&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;mn-exports-imports&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;From Edward Tufte, &lt;em&gt;Visual Display of Quantitative Information&lt;/em&gt;, page 92.&lt;/span&gt;
+		&lt;img src=&quot;/assets/img/exports-imports.png&quot; alt=&quot;Exports and Imports to and from Denmark &amp; Norway from 1700 to 1780&quot; /&gt;
+	&lt;/figure&gt;
+
+	&lt;p&gt;&lt;label for=&quot;mn-figure-1&quot; class=&quot;margin-toggle&quot;&gt;&amp;#8853;&lt;/label&gt;&lt;input type=&quot;checkbox&quot; id=&quot;mn-figure-1&quot; class=&quot;margin-toggle&quot;/&gt;&lt;span class=&quot;marginnote&quot;&gt;&lt;img src=&quot;/assets/img/rhino.png&quot; alt=&quot;Image of a Rhinoceros&quot;/&gt;F.J. Cole, “The History of Albrecht Dürer’s Rhinoceros in Zooological Literature,” &lt;em&gt;Science, Medicine, and History: Essays on the Evolution of Scientific Thought and Medical Practice&lt;/em&gt; (London, 1953), ed. E. Ashworth Underwood, 337-356. From page 71 of Edward Tufte’s &lt;em&gt;Visual Explanations&lt;/em&gt;.&lt;/span&gt; But tight integration of graphics with text is central to Tufte’s work even when those graphics are ancillary to the main body of a text. In many of those cases, a margin figure may be most appropriate. To place figures in the margin, just wrap an image (or whatever) in a margin note inside a &lt;code&gt;p&lt;/code&gt; tag, as seen to the right of this paragraph.&lt;/p&gt;
+	&lt;p&gt;If you need a full-width figure, give it the &lt;code&gt;fullwidth&lt;/code&gt; class. Make sure that’s inside an &lt;code&gt;article&lt;/code&gt;, and it will take up (almost) the full width of the screen. This approach is demonstrated below using Edward Tufte’s English translation of the Napoleon’s March data visualization. From &lt;em&gt;Beautiful Evidence&lt;/em&gt;, page 122-124.&lt;/p&gt;
+	&lt;figure class=&quot;fullwidth&quot;&gt;
+		&lt;img src=&quot;/assets/img/napoleons-march.png&quot; alt=&quot;Figurative map of the successive losses of the French Army in the Russian campaign, 1812-1813&quot; /&gt;
+	&lt;/figure&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2 id=&quot;code&quot;&gt;Code&lt;/h2&gt;
+	&lt;p&gt;Technical jargon, programming language terms, and code samples are denoted with the &lt;code&gt;code&lt;/code&gt; class, as I’ve been using in this document to denote HTML. Code needs to be monospace for formatting purposes and to aid in code analysis, but it must maintain its readability. To those ends, Tufte CSS follows GitHub’s font selection, which shifts gracefully along the monospace spectrum from the elegant but rare Consolas all the way to good old reliable Courier.&lt;/p&gt;
+	&lt;p&gt;Extended code examples should use a &lt;code&gt;pre&lt;/code&gt; tag with class &lt;code&gt;code&lt;/code&gt;. This adds control over indentation and overflow as well:&lt;/p&gt;
+	&lt;pre class=&quot;code&quot;&gt;;; Some code examples in Clojure. This is a comment.
+
+;; applying a function to every item in the collection
+(map tufte-css blog-posts)
+;;;; if unfamiliar, see http://www.lispcast.com/annotated-map
+
+;; side-effecty loop (unformatted, causing text overflow) - from https://clojuredocs.org/clojure.core/doseq
+(doseq [[[a b] [c d]] (map list (sorted-map :1 1 :2 2) (sorted-map :3 3 :4 4))] (prn (* b d)))
+
+;; that same side-effecty loop, formatted
+(doseq [[[a b] [c d]] (map list
+										 (sorted-map :1 1 :2 2)
+										 (sorted-map :3 3 :4 4))]
+(prn (* b d)))
+
+;; If this proselytizing has worked, check out:
+;; http://howistart.org/posts/clojure/1&lt;/pre&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2 id=&quot;imagequilts&quot;&gt;ImageQuilts&lt;/h2&gt;
+	&lt;p&gt;Tufte CSS provides support for Edward Tufte and Adam Schwartz’s &lt;a href=&quot;http://imagequilts.com/&quot;&gt;ImageQuilts&lt;/a&gt;. See the &lt;a href=&quot;http://www.edwardtufte.com/bboard/q-and-a-fetch-msg?msg_id=0003wk&quot;&gt;ET forum announcement thread&lt;/a&gt; for more on quilts. Some have ragged edges, others straight. Include these images just as you would any other &lt;code&gt;figure&lt;/code&gt;.&lt;/p&gt;
+	&lt;p&gt;This is an ImageQuilt surveying Chinese calligraphy, placed in a full-width figure to accomodate its girth:&lt;/p&gt;
+	&lt;figure class=&quot;fullwidth&quot;&gt;&lt;img src=&quot;/assets/img/imagequilt-chinese-calligraphy.png&quot; alt=&quot;Image of Chinese Calligraphy&quot;/&gt;&lt;/figure&gt;
+	&lt;p&gt;Here is an ImageQuilt of 47 animal sounds over and over, in a figure constrained to the main text region. This quilt has ragged edges, but the image itself is of course still rectangular.&lt;/p&gt;
+	&lt;figure&gt;&lt;img src=&quot;/assets/img/imagequilt-animal-sounds.png&quot; alt=&quot;Image of animal sounds&quot;/&gt;&lt;/figure&gt;
+&lt;/section&gt;
+
+&lt;section&gt;
+	&lt;h2 id=&quot;epilogue&quot;&gt;Epilogue&lt;/h2&gt;
+	&lt;p&gt;Many thanks go to Edward Tufte for leading the way with his work. It is only through his kind and careful editing that this project accomplishes what it does. All errors of implementation are of course mine.&lt;/p&gt;
+&lt;/section&gt;</description>
+        <pubDate>Thu, 16 Mar 2017 12:00:00 +0900</pubDate>
+        <link>http://toolofthought.github.com/jekyll/2017/03/16/tufte-css/</link>
+        <guid isPermaLink="true">http://toolofthought.github.com/jekyll/2017/03/16/tufte-css/</guid>
+        
+        
+        <category>jekyll</category>
+        
+      </item>
+    
+  </channel>
+</rss>
