@@ -40,3 +40,12 @@ xmp.code { font-size: 0.9rem;
 
 xmp.code.fullwidth { width: 90%; }
 
+/* index.html
+*/
+li.listing {
+  list-style: none;
+}
+
+.smaller { font-size: 80%;}
+/* end index.html
+*/
