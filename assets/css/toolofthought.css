@@ -49,3 +49,9 @@ li.listing {
 .smaller { font-size: 80%;}
 /* end index.html
 */
+
+/* begin nav */
+nav li {
+  display: inline;
+}
+/* end nav */
