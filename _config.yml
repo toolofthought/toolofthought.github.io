@@ -10,7 +10,7 @@ url: "http://toolofthought.github.com"
 # Build settings
 markdown: kramdown
 highlighter: rouge
-paginate: 10 
+paginate: 5 
 paginate_path: "/posts/page:num/"
 exclude: ["less","node_modules","Gruntfile.js","package.json","README.md"]
 
