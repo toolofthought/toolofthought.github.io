@@ -130,3 +130,100 @@ draw_webd3_ ''
 	</xmp>
 </section>
 
+<section>
+  <h2>Line Chart</h2>
+  <figure>
+    <img src="{{site.baseurl}}/assets/img/vis/d3/webd3-line.png" alt="line-chart"/>
+  </figure>
+  <p><label for="line-chart-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="line-chart-figure" class="margin-toggle"/><span class="marginnote"><a href="https://bl.ocks.org/mbostock/3883245">Mike Bostock’s Block 3883245</a></span>데이터를 사용하는 경우 <code>file2url</code>을 사용해 파일의 위치를 지정해야 합니다. <code>regex</code>를 이용해 원래 파일 이름을 새 위치로 치환합니다.</p>
+  <xmp class="code">
+require 'regex'
+
+svgview =: 3 : 0
+wd 'pc browser'
+wd 'minwh 970 510'
+wd 'setp stylesheet * * { background-color: #fffff8; }'
+wd 'pas 0 0'
+wd 'cc window webview'
+wd 'set window baseurl *' , file2url jpath '~temp'
+wd 'set window html *', HTML
+wd 'pshow'
+)
+
+browser_close =: 3 : 0
+wd 'pclose'
+)
+
+DATAURL =: file2url jpath '~temp/data.tsv'
+HTML =: ('data.tsv'; DATAURL) rxrplc 0 : 0
+<!DOCTYPE html>
+<style>
+body {
+  background-color: #fffff8;
+}
+</style>
+<svg width="960" height="500"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var parseTime = d3.timeParse("%d-%b-%y");
+
+var x = d3.scaleTime()
+    .rangeRound([0, width]);
+
+var y = d3.scaleLinear()
+    .rangeRound([height, 0]);
+
+var line = d3.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.close); });
+
+d3.tsv("data.tsv", function(d) {
+  d.date = parseTime(d.date);
+  d.close = +d.close;
+  return d;
+}, function(error, data) {
+  if (error) throw error;
+
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain(d3.extent(data, function(d) { return d.close; }));
+
+  g.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+    .select(".domain")
+      .remove();
+
+  g.append("g")
+      .call(d3.axisLeft(y))
+    .append("text")
+      .attr("fill", "#000")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 6)
+      .attr("dy", "0.71em")
+      .attr("text-anchor", "end")
+      .text("Price ($)");
+
+  g.append("path")
+      .datum(data)
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-linejoin", "round")
+      .attr("stroke-linecap", "round")
+      .attr("stroke-width", 1.5)
+      .attr("d", line);
+});
+
+</script>
+)
+
+svgview ''
+  </xmp>
+</section>
+

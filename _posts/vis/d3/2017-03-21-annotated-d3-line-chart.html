@@ -1,0 +1,86 @@
+---
+layout: post
+title:  "Annotated Line Chart"
+date:   2017-03-21 09:00:00 +0900
+author: yunskim
+categories: vis d3
+permalink: /:categories/:title/
+---
+<figure>
+    <img src="{{site.baseurl}}/assets/img/vis/d3/webd3-line.png" alt="line-chart"/>
+</figure>
+<p><label for="line-chart-figure" class="margin-toggle">&#8853;</label><input type="checkbox" id="line-chart-figure" class="margin-toggle"/><span class="marginnote"><a href="https://bl.ocks.org/mbostock/3883245">Mike Bostock’s Block 3883245</a></span></p>
+
+<xmp class="code">
+<!DOCTYPE html>
+<svg width="960" height="500"></svg>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script>
+/* html 태그 지정 */
+var svg = d3.select("svg"),
+    margin = {top: 20, right: 20, bottom: 30, left: 50},
+    width = +svg.attr("width") - margin.left - margin.right,
+    height = +svg.attr("height") - margin.top - margin.bottom,
+    g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")"); // svg 아래에 g태그로 전체 차트를 그룹화, 왼쪽 위에 공백 지정
+
+var parseTime = d3.timeParse("%d-%b-%y");
+
+
+/* scale 설정 */
+// tsv를 아직 읽지 않아서 domain은 정의하지 않음
+var x = d3.scaleTime()
+    .rangeRound([0, width]);//time을 사용하기 위해 rangeRound 
+
+var y = d3.scaleLinear()
+    .rangeRound([height, 0]);
+
+/* 차트 outline 설정 */
+// 데이터는 date, close 속석을 갖진 객체의 어레이 
+var line = d3.line()
+    .x(function(d) { return x(d.date); })
+    .y(function(d) { return y(d.close); });
+
+/* 데이터 로딩 */
+d3.tsv("data.tsv", function(d) {
+  d.date = parseTime(d.date);
+  d.close = +d.close;
+  return d;
+}, function(error, data) {
+  if (error) throw error;
+
+  // x, y domain 설정
+  // d3.extent()는 [min, max]를 동시에 계산
+  x.domain(d3.extent(data, function(d) { return d.date; }));
+  y.domain(d3.extent(data, function(d) { return d.close; }));
+
+  // x축
+  g.append("g")
+      .attr("transform", "translate(0," + height + ")")
+      .call(d3.axisBottom(x))
+    .select(".domain") // ".domain"을 제거해 x축의 가로줄을 제거합니다.
+      .remove();
+
+  // y축
+  g.append("g")
+      .call(d3.axisLeft(y))
+    .append("text")
+      .attr("fill", "#000")
+      .attr("transform", "rotate(-90)") // 반시계방행 90도 회전, 원래는 x축에 평행
+      .attr("y", 6) // y coordinate 방향 좌표, 반시계방향 회전때문에 x축 방향으로
+      .attr("dy", "0.71em") // y방향으로 폰트의 0.71배 이동, 반시계바앙향 회존으로 x축 방향으로 이동
+      .attr("text-anchor", "end") // 텍스트 정렬기준 (start | middle | end )
+      .text("Price ($)");
+
+  // line
+  g.append("path")
+      .datum(data) // path가 하나이므로 data() 대신 datum() , datum() -: data()"_
+      .attr("fill", "none")
+      .attr("stroke", "steelblue")
+      .attr("stroke-linejoin", "round") // stroke 교차 처리 miter | round | bevel
+      .attr("stroke-linecap", "round") // stroke 끝단 처리 butt | round | square
+      .attr("stroke-width", 1.5)
+      .attr("d", line);
+});
+
+</script>
+</xmp>
